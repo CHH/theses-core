@@ -1,0 +1,10 @@
+{% extends "pane.html" %}
+{% block pane_title %}
+<h1>Create User</h1>
+{% endblock %}
+
+{% block pane_main %}
+<form method="post" action="{{ path('user_create') }}">
+    {% include "users/_editor.html" %}
+</form>
+{% endblock %}

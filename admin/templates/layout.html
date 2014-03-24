@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}Admin{% endblock %}</title>
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//brick.a.ssl.fastly.net/Open+Sans:300,300i,400,400i,600,600i/Crimson:400,400i,600,600i">
+        <link rel="stylesheet" type="text/css" href="/assets/admin/styles/screen.css" />
+
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body>
+        <div id="site">
+            <header id="main-head">
+                <nav id="main-nav">
+                    <ul>
+                        <li class="menu-entry user {{ app.request.attributes.get('_route') == 'dashboard' ? 'active' : '' }}">
+                            <a href="{{ path('dashboard') }}">
+                                <img class="user-avatar" src="{{ gravatar(app.user.email, {size: 128}) }}">
+                                <span class="menu-label">{{ app.user.displayName|split(' ')|first }}</span>
+                            </a>
+                        </li>
+                    {% for entry in app.menu %}
+                        {% if entry.route is defined and entry.route != "" %}
+                            {% set href = path(entry.route) %}
+                        {% elseif entry.url is defined %}
+                            {% set href = entry.url %}
+                        {% endif %}
+                        <li class="menu-entry {{ entry.route is defined and app.request.attributes.get('_route') == entry.route ? 'active' : '' }}">
+                            <a href="{{ href }}">
+                                <i class="menu-icon fa fa-{{ entry.icon }}"></i>
+                                <span class="menu-label">{{ entry.label }}</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                </nav>
+            </header>
+            <main id="main-content">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+
+        <script type="text/javascript" src="/assets/admin/scripts/application.js"></script>
+
+        {% block body_end %}{% endblock %}
+    </body>
+</html>

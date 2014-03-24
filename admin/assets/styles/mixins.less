@@ -1,0 +1,14 @@
+.input-placeholder(@rules) {
+    &::-webkit-input-placeholder { /* WebKit browsers */
+        @rules();
+    }
+    &:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+        @rules();
+    }
+    &::-moz-placeholder { /* Mozilla Firefox 19+ */
+        @rules();
+    }
+    &:-ms-input-placeholder { /* Internet Explorer 10+ */
+        @rules();
+    }
+}

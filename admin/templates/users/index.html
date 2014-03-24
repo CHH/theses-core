@@ -1,0 +1,35 @@
+{% extends 'pane.html' %}
+{% block pane_title %}
+    <h1>Users</h1>
+    <div class="pane-actions">
+        <a href="{{path('user_create')}}" class="btn btn-primary">Create a new user</a>
+    </div>
+{% endblock %}
+
+{% block pane_main %}
+<header class="page-title">
+</header>
+<table>
+    <thead>
+        <th></th>
+        <th>Username</th>
+        <th>Display Name</th>
+        <th>Email</th>
+        <th></th>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td><img src="{{ gravatar(user.email, {size: 96}) }}" height="48" alt="{{ user.email }}"></td>
+            <td><a href="{{ path('user_edit', {id: user.id}) }}">{{user.username}}</a></td>
+            <td>{{user.display_name}}</td>
+            <td><a href="mailto:{{user.email}}">{{ user.email }}</a></td>
+            <td>
+                <a href="{{ path('user_edit', {id: user.id}) }}">Edit</a>
+                <a class="delete" href="{{ path('user_delete', {id: user.id}) }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

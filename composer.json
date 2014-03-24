@@ -1,0 +1,39 @@
+{
+    "name": "chh/theses-core",
+    "description": "Nothing to see here yet. Move along.",
+    "require": {
+        "pimple/pimple": "~1.0",
+        "silex/silex": "~1.0",
+        "silex/web-profiler": "~1.0",
+        "twig/twig": "~1.9",
+        "twig/extensions": "~1.0",
+        "symfony/twig-bridge": "~2.0",
+        "symfony/security": "~2.0",
+        "symfony/finder": "~2.0",
+        "symfony/form": "~2.0",
+        "symfony/validator": "~2.3",
+        "symfony/config": "~2.3",
+        "symfony/translation": "~2.3",
+        "jackalope/jackalope-doctrine-dbal": "~1.0",
+        "stack/builder": "~1.0",
+        "stack/run": "~1.0",
+        "stack/lazy-http-kernel": "~1.0",
+        "stack/url-map": "~1.0",
+        "doctrine/dbal": "~2.0",
+        "mheap/gravatar-php": "@dev",
+        "mheap/silex-gravatar": "@dev",
+        "monolog/monolog": "~1.0",
+        "cocur/slugify": "~0.4",
+        "cebe/markdown": "~1.0@dev",
+        "vlucas/phpdotenv": "~1.0",
+        "nikic/iter": "~1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "theses\\": "src/"
+        }
+    }
+}

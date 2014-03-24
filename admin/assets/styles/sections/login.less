@@ -1,0 +1,73 @@
+.login {
+    background: @color-primary;
+
+    h1 {
+        color: contrast(@color-primary);
+        font-weight: 100;
+        font-size: 4em;
+    }
+
+    .login-wrapper {
+        padding: 1em;
+        width: 25em;
+        margin: 4em auto 0;
+    }
+
+    form {
+        .login-error {
+            margin: 0 0 1em;
+            padding: 1em;
+            color: contrast(@color-destruct);
+            background: @color-destruct;
+        }
+
+        > div {
+            margin: 0 0 1em;
+        }
+
+        label, input {
+            display: block;
+            width: 100%;
+        }
+
+        label {
+            margin: 0 0 0.5em;
+            color: contrast(@color-primary);
+        }
+
+        .login-inputs {
+            border-radius: 5px;
+            border: 1px solid contrast(@color-primary);
+            label[for=username], label[for=password] { display: none; }
+
+            > div {
+                border-bottom: 1px solid contrast(@color-primary);
+                margin: 0;
+
+                &:last-child {
+                    border-bottom-width: 0px;
+                }
+            }
+        }
+
+        input {
+            @bg-color: @color-primary;
+            box-sizing: border-box;
+            border: none;
+            background: transparent;
+            padding: 0.5em;
+            color: contrast(@bg-color);
+
+            .input-placeholder({ color: fade(black, 20%); });
+        }
+
+        button[type=submit] {
+            display: block;
+            width: 100%;
+        }
+
+        .btn {
+            .btn-inverted;
+        }
+    }
+}

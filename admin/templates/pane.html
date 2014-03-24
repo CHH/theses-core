@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="pane">
+    <header class="pane-title">
+        {% block pane_title %}
+        {% endblock %}
+    </header>
+    <section class="pane-main">
+        {% block pane_main %}
+        {% endblock %}
+    </section>
+    <footer class="pane-footer">
+        {% block pane_footer %}
+        {% endblock %}
+    </footer>
+</div>
+{% endblock %}

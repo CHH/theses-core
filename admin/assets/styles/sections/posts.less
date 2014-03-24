@@ -1,0 +1,214 @@
+.post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    > li {
+        padding: 0;
+        margin: 0;
+    }
+
+    .post-preview {
+        border-bottom: 1px solid #ddd;
+        background: white;
+        padding: 1em 4em;
+        position: relative;
+        border-left: 4px solid red;
+
+        &.published {
+            border-left: none;
+        }
+
+        .post-title, .post-content, .post-actions {
+            padding: 0em;
+        }
+
+        .post-meta {
+            margin: 1em 0 0;
+            color: fade(black, 50%);
+            font-size: 0.8em;
+        }
+
+        .post-title > h1, .post-content {
+            font-family: @font-serif;
+        }
+
+        .post-content {
+            position: relative;
+
+            * {
+                color: fade(black, 20%);
+            }
+
+            p {
+                margin: 0 0 1em;
+            }
+        }
+
+        .post-title {
+            padding-bottom: 1em;
+
+            > h1 {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 1.5em;
+                font-weight: 600;
+                margin: 0;
+
+                > a {
+                    text-decoration: none;
+                    border-bottom: 1px solid fade(black, 10%);
+
+                    &:hover {
+                        border-bottom: 1px solid;
+                    }
+                }
+            }
+        }
+
+        .post-actions {
+            position: absolute;
+            bottom: 1em;
+            right: 4em;
+            opacity: 0;
+            transition: opacity 0.1s;
+
+            > a {
+                font-size: 0.8em;
+            }
+        }
+
+        &:hover .post-actions {
+            transition: opacity 0.1s;
+            opacity: 1;
+        }
+    }
+}
+
+.post-editor-layout {
+    background: #f2f2ed;
+    height: 100%;
+}
+
+.post-editor {
+    display: flex;
+    //flex-direction: column;
+    align-content: stretch;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    div {
+        margin: 0;
+    }
+
+    .editor-main {
+        max-width: 61%;
+        margin: 0 auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-properties {
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            .property {
+                flex: 1;
+            }
+
+            .value {
+                flex: 1;
+            }
+        }
+    }
+
+    .editor-sidebar {
+        //background: white;
+        border-left: 1px solid fade(black, 10%);
+        width: 30%;
+        padding: 2em;
+        opacity: 0.3;
+        overflow-y: auto;
+        transition: opacity 2s;
+
+        &:hover {
+            transition: opacity 0.3s;
+            opacity: 1;
+        }
+
+        > h1 {
+            margin: 2em 0 0.5em;
+            font-size: 1em;
+        }
+    }
+
+    label[for="post-title"] {
+        display: none;
+    }
+
+    // Deprecated
+    .editor-actions {
+        padding: 1em 1em;
+        margin: 0;
+        display: flex;
+        opacity: 0.3;
+        transition: opacity 2s;
+
+        &:hover {
+            transition: opacity 0.2s;
+            opacity: 1;
+        }
+
+        > * {
+            font-size: 0.8em;
+            margin: 0 0.5em;
+            align-self: baseline;
+        }
+
+        .spacer {
+            flex: 1;
+        }
+    }
+
+    .CodeMirror {
+        flex: 1;
+        width: 100%;
+        //height: auto;
+        //overflow-y: auto;
+        font-family: @font-serif;
+        font-size: 18px;
+    }
+
+    .editor-toolbar {
+    }
+
+    .title {
+        margin: 0;
+        padding: 1em 0em 1em;
+        box-sizing: border-box;
+    }
+
+    #post-title {
+        width: 100%;
+        border: none;
+        //background: fade(black, 4%);
+        background: transparent;
+        //border-bottom: 1px solid #ddd;
+        font-size: 2em;
+        font-family: @font-serif;
+        font-weight: 300;
+        padding: 0em 0;
+
+        .input-placeholder({
+            color: fade(black, 20%);
+        });
+    }
+}

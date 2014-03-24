@@ -1,0 +1,86 @@
+/*
+    Layouts within the pane
+*/
+.pane {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-content: stretch;
+
+    .pane-title,
+    .pane-main,
+    .pane-footer {
+        padding: 0 4em;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    .pane-title {
+        width: 100%;
+        overflow: hidden;
+        padding: 1em 4em;
+        background: @color-primary;
+
+        > h1 {
+            margin: 0;
+            font-weight: 100;
+            font-size: 2em;
+            color: contrast(@color-primary);
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .pane-actions {
+            margin: 0.5em -0.5em 0 0;
+            margin-top: 0.5em;
+            margin-right: -0.5em;
+
+            a, .btn {
+                margin: 0 0.5em 0 0;
+            }
+        }
+
+        .back-btn {
+            margin: 0 1em 0 0;
+        }
+
+        .btn {
+            .btn-inverted;
+        }
+
+        .btn-primary {
+            font-weight: 600;
+        }
+    }
+
+    @media screen and (min-width: 620px) {
+        .pane-title {
+            display: flex;
+            align-content: stretch;
+            justify-content: space-between;
+
+            > h1 {
+                flex: 1;
+            }
+
+            .pane-actions {
+                margin-top: 0;
+            }
+        }
+    }
+
+    .pane-main {
+        flex: 1;
+        padding-top: 1em;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+
+        &.without-padding {
+            padding: 0 !important;
+        }
+    }
+
+    .pane-footer {
+    }
+}

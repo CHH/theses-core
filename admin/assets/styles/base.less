@@ -1,0 +1,140 @@
+
+body {
+    font-family: @font-sans;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.right {
+    float: right;
+}
+
+.clearfix {
+    &:after {
+        content: "";
+        clear: both;
+    }
+}
+
+a {
+    color: @color-secondary;
+    text-decoration: none;
+    border-bottom: 1px solid fade(black, 10%);
+
+    &:hover {
+        border-bottom: 1px solid;
+    }
+
+    &:active {
+        position: relative;
+        top: 1px;
+    }
+
+    &.delete {
+        color: @color-destruct;
+    }
+}
+
+#site {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+#main-head {
+    background: #302a2a;
+}
+
+#main-content {
+    height: 100%;
+    flex: 1;
+    background: #f5f5f5;
+}
+
+#main-nav {
+    padding: 20px;
+
+    > ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .user {
+        img.user-avatar {
+            width: 3em;
+            border-radius: 9px;
+        }
+    }
+
+    .menu-entry {
+        margin: 0 0 2em;
+        text-align: center;
+
+        &.active a {
+            color: @color-menu-active;
+
+            &:hover {
+                color: lighten(@color-menu-active, 5%);
+            }
+        }
+
+        a {
+            transition: 0.2s color;
+            color: fade(white, 60%);
+            text-decoration: none;
+            border: none;
+
+            &:hover {
+                color: fade(white, 80%);
+                transition: 0.2s color;
+            }
+        }
+
+        .menu-icon {
+            font-size: 2em;
+            display: block;
+        }
+
+        .menu-label {
+            margin: 0.5em 0 0;
+            display: block;
+            font-size: 0.7em;
+            font-weight: 300;
+        }
+    }
+}
+
+#quick-post {
+    nav {
+        > ul {
+            display: inline-block;
+            list-style: none;
+            padding: 0;
+
+            > li {
+                display: inline-block;
+                margin: 0 0 0 1em;
+            }
+        }
+
+        a {
+            i.fa {
+                display: inline-block;
+                color: fade(black, 50%);
+                margin: 0 0.3em 0 0;
+            }
+
+            color: black;
+        }
+
+        .active a {
+            color: @color-menu-active;
+        }
+    }
+}

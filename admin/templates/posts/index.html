@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="pane">
+    <div class="pane-title">
+        <h1>Posts</h1>
+
+        <div class="pane-actions">
+            <a href="{{path('posts_create')}}" class="btn btn-primary">
+                Create Post
+            </a>
+        </div>
+    </div>
+
+    <div class="pane-main without-padding">
+        <ol class="post-list">
+            {% for post in posts|reverse %}
+            <li>
+                <article class="post-preview {{ post.publishedAt ? 'published' : '' }}">
+                    <header class="post-title">
+                        <h1>
+                            <a href="{{ path('posts_edit', {slug: post.slug}) }}">
+                                {{ post.title }}
+                            </a>
+                        </h1>
+                    </header>
+                    <section class="post-content post-excerpt">
+                        {{ post.content | markdown | striptags | truncate(300) }}
+                    </section>
+                    <footer>
+                        <div class="post-meta">
+                            {% if post.createdAt %}
+                            Last updated {{ post.lastModified | date('M d Y') }}
+                            {% endif %}
+
+                            {% if post.publishedAt|default('') %}
+                            Published at {{ post.publishedAt | date('M d Y') }}
+                            {% else %}
+                            Not published yet
+                            {% endif %}
+                        </div>
+
+                        <span class="post-actions">
+                            <a href="{{ path('posts_edit', {slug: post.slug}) }}">Edit</a>
+                            <a class="delete" href="{{ path('posts_delete', {id: post.id}) }}">Delete</a>
+                        </span>
+                    </footer>
+                </article>
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+{% endblock %}

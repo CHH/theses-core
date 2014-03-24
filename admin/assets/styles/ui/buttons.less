@@ -1,0 +1,73 @@
+@btn-primary-color: @color-primary;
+@btn-primary-background: transparent;
+@btn-delete-color: #e9282a;
+
+.btn,
+.btn-borderless {
+    display: inline-block;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    color: @color-btn;
+    box-sizing: border-box;
+    font-weight: 600;
+}
+
+.btn-borderless {
+    &.btn-primary {
+        font-weight: bold;
+    }
+}
+
+.btn {
+    border-radius: 3px;
+    border: 1px solid fade(black, 10%);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &.btn-delete {
+        color: @btn-delete-color;
+
+        &:hover {
+        }
+    }
+
+    &:hover {
+        border-color: fade(black, 20%);
+    }
+
+    &.btn-primary {
+        background: @btn-primary-background;
+        color: @btn-primary-color;
+        //color: contrast(@btn-primary-background, fade(black, 90%), fade(white, 90%));
+        transition: 0.2s background;
+        border: 2px solid @btn-primary-color;
+
+        &:hover {
+            transition: 0.2s background;
+            background: fade(@btn-primary-color, 5%);
+        }
+    }
+}
+
+&.btn-stretched {
+    width: 100%;
+    display: block;
+}
+
+.btn-inverted {
+    border: 2px solid contrast(@color-primary);
+    color: contrast(@color-primary);
+
+    &:hover {
+        background: fade(contrast(@color-primary), 20%);
+    }
+
+    &:active {
+        background: fade(contrast(@color-primary), 60%);
+    }
+}
+
+.btn-inverted.btn-primary {
+    font-weight: 600;
+}

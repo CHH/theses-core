@@ -1,0 +1,7 @@
+{% extends "posts/editor_layout.html" %}
+
+{% block content %}
+<form class="post-editor" method="post" action="{{ path('posts_edit', {slug: post.slug}) }}">
+    {% include "posts/_editor.html" %}
+</form>
+{% endblock %}

@@ -1,0 +1,29 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td, th {
+        padding: 0.4em;
+        border: 1px solid lighten(black, 90%);
+        background: white;
+
+        &.align-right {
+            text-align: right;
+        }
+
+        &.align-left {
+            text-align: left;
+        }
+
+        &.align-center {
+            text-align: center;
+        }
+    }
+
+    th {
+        background: fade(white, 50%);
+        color: fade(black, 50%);
+        font-weight: 300;
+        border-bottom: 3px solid lighten(black, 90%);
+    }
+}

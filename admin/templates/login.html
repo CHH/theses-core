@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <link rel="stylesheet" type="text/css" href="/assets/admin/styles/screen.css">
+    </head>
+    <body class="login">
+        <div class="login-wrapper">
+            <h1>Login</h1>
+
+            <form action="{{ path('login_check') }}" method="post">
+                {% if error %}
+                <div class="login-error">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <div class="login-inputs">
+                    <div>
+                        <label for="username">
+                            Username
+                        </label>
+                        <input placeholder="Username" autofocus id="username" type="text" name="_username" value="{{ last_username }}" />
+                    </div>
+                    <div>
+                        <label for="password">
+                            Password
+                        </label>
+                        <input placeholder="Password" id="password" type="password" name="_password" value="" />
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>

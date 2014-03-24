@@ -1,0 +1,83 @@
+{% block head %}
+<link rel="stylesheet" href="http://lab.lepture.com/editor/editor.css" />
+<script type="text/javascript" src="http://lab.lepture.com/editor/editor.js"></script>
+{% endblock %}
+
+{#
+<div class="editor-actions">
+    <a href="{{ path('posts') }}">&larr; Back to posts</a>
+    {% if post['jcr:lastModified'] is defined %}
+    <span class="meta">Last updated {{ post['jcr:lastModified'] | date('M d Y \\a\\t H:i') }}</span>
+    {% endif %}
+    <span class="spacer"></span>
+    <button name="save" type="submit" class="btn btn-primary">Save Post</button>
+
+    {% if post['publishedAt'] is defined and post['publishedAt'] is not empty %}
+    <button name="unpublish" type="submit" class="btn btn-primary">Unpublish</button>
+    {% else %}
+    <button name="publish" type="submit" class="btn btn-primary">Publish</button>
+    {% endif %}
+</div>
+#}
+
+<main class="editor-main">
+    <div class="title">
+        <label for="post-title">Title</label>
+        <!-- <input type="text" id="post-title" name="post[title]" placeholder="e.g. One weird trick …" value="{{ post.title }}">-->
+        <textarea id="post-title" rows=1 cols=80 name="post[title]" placeholder="One weird trick …">{{ post.title }}</textarea>
+    </div>
+
+    <textarea name="post[content]" id="post-content" rows="10" cols="90">{% if post.content is defined %}{{ post.content }}{% endif %}</textarea>
+
+    <script>
+        (function() {
+         var title = document.getElementById('post-title');
+         title.addEventListener('keydown', autosize);
+
+         function autosize() {
+             var el = this;
+             setTimeout(function(){
+                 el.style.cssText = 'height:0; padding:0';
+                 el.style.cssText = 'height:' + el.scrollHeight + 'px';
+             }, 0);
+         }
+         autosize.call(title);
+
+         var editor = new Editor({element: document.getElementById('post-content')});
+         editor.render();
+         })();
+     </script>
+</main>
+
+<aside class="editor-sidebar">
+    <p>
+        <a href="{{ path('posts') }}">&larr; Back to posts</a>
+    </p>
+    {% if post.lastModified is defined %}
+    <p>
+        <span class="meta">Last updated {{ post.lastModified | date('M d Y \\a\\t H:i') }}</span>
+    </p>
+    {% endif %}
+    {% if post.publishedAt is not empty %}
+    <p>
+        Published at {{ post.publishedAt|date('M d Y \\a\\t H:i') }}
+    </p>
+    {% endif %}
+    <p class="toolbar stretch-childs">
+        <button name="save" type="submit" class="btn btn-primary">Save Post</button>
+    {% if post.publishedAt is not empty %}
+        <button name="unpublish" type="submit" class="btn btn-primary">Unpublish</button>
+    {% else %}
+        <button name="publish" type="submit" class="btn btn-primary">Publish</button>
+    {% endif %}
+    </p>
+    {% if post.id is not empty %}
+    <p>
+        <a href="{{ path('posts_delete', {id: post.id}) }}" class="delete">Delete this post</a>
+    </p>
+    {% endif %}
+
+    <h1>Custom Properties</h1>
+    <p class="custom-properties">
+    </p>
+</aside>

@@ -1,0 +1,12 @@
+{% extends "posts/editor_layout.html" %}
+
+{% block content %}
+<form class="post-editor" method="post" action="{{ path('posts_create') }}">
+    {% include "posts/_editor.html" %}
+</form>
+{% endblock %}
+{% block body_end %}
+    <script type="text/javascript">
+        $("#post-title").focus();
+    </script>
+{% endblock %}
