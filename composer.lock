@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "ecef569e7af36bf38531fb9d8aba6151",
+    "hash": "c2810aea061cd039b3448aa4dd9309cd",
     "packages": [
         {
             "name": "cebe/markdown",

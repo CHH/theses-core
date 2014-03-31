@@ -2,6 +2,8 @@
 
 namespace theses;
 
+use Symfony\Component\HttpFoundation\Request;
+
 class AdminApplication extends \Silex\Application
 {
     use \Silex\Application\UrlGeneratorTrait;
@@ -9,7 +11,7 @@ class AdminApplication extends \Silex\Application
     use \Silex\Application\FormTrait;
     use \Silex\Application\SecurityTrait;
 
-    function __construct()
+    function __construct(array $values = [])
     {
         parent::__construct();
 
@@ -37,12 +39,15 @@ class AdminApplication extends \Silex\Application
 
         $app->register(new \Silex\Provider\UrlGeneratorServiceProvider);
         $app->register(new \Silex\Provider\MonologServiceProvider, [
-            'monolog.name' => 'admin',
-            'monolog.logfile' => __DIR__ . '/../data/admin.log',
+            'monolog.name' => 'theses.admin',
         ]);
 
+        $app['monolog.logfile'] = function() use ($app) {
+            return $app['theses']['data_dir'] . '/app.log';
+        };
+
         $app->register(new \Silex\Provider\TwigServiceProvider, [
-            'twig.path' => __DIR__ . '/templates'
+            'twig.path' => __DIR__ . '/../resources/admin/templates'
         ]);
 
         $app->register(new \Silex\Provider\SecurityServiceProvider);
@@ -55,7 +60,7 @@ class AdminApplication extends \Silex\Application
                 'pattern' => '^/',
                 'form' => array('login_path' => '/login', 'check_path' => '/login_check'),
                 'users' => function() use ($app) {
-                    return new theses\auth\UserProvider($app['shared']['db']);
+                    return new auth\UserProvider($app['theses']['db']);
                 },
                     'logout' => ['logout_path' => '/logout']
                 ),
@@ -67,7 +72,7 @@ class AdminApplication extends \Silex\Application
         }));
 
         $app['posts'] = $app->share(function() use ($app) {
-            return new \theses\PostRepository($app['shared']['phpcr.session']);
+            return $app['theses']['posts'];
         });
 
         $app['user.salt'] = $_SERVER['SALT'];
@@ -91,5 +96,9 @@ class AdminApplication extends \Silex\Application
                 'last_username' => $app['session']->get('_security.last_username'),
             ));
         })->bind('admin_login');
+
+        foreach ($values as $key => $value) {
+            $this[$key] = $value;
+        }
     }
 }

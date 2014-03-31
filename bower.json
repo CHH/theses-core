@@ -16,6 +16,7 @@
   "dependencies": {
     "zepto": "~1.1.2",
     "normalize-css": "~3.0.0",
-    "react": "~0.8.0"
+    "react": "~0.8.0",
+    "keymaster": "~1.6.2"
   }
 }

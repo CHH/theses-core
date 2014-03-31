@@ -24,7 +24,7 @@
                         </h1>
                     </header>
                     <section class="post-content post-excerpt">
-                        {{ post.content | markdown | striptags | truncate(300) }}
+                        {{ post.content | striptags | truncate(300) }}
                     </section>
                     <footer>
                         <div class="post-meta">

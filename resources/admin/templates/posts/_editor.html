@@ -27,7 +27,7 @@
         <textarea id="post-title" rows=1 cols=80 name="post[title]" placeholder="One weird trick …">{{ post.title }}</textarea>
     </div>
 
-    <textarea name="post[content]" id="post-content" rows="10" cols="90">{% if post.content is defined %}{{ post.content }}{% endif %}</textarea>
+    <textarea name="post[content]" id="post-content" rows="10" cols="90">{% if post.rawContent is defined %}{{ post.rawContent }}{% endif %}</textarea>
 
     <script>
         (function() {
@@ -60,7 +60,7 @@
     {% endif %}
     {% if post.publishedAt is not empty %}
     <p>
-        Published at {{ post.publishedAt|date('M d Y \\a\\t H:i') }}
+        Published at {{ post.publishedAt|date('M d Y \\a\\t H:i') }}.
     </p>
     {% endif %}
     <p class="toolbar stretch-childs">
@@ -71,6 +71,11 @@
         <button name="publish" type="submit" class="btn btn-primary">Publish</button>
     {% endif %}
     </p>
+    {% if post.publishedAt is not empty %}
+    <p>
+        <a href="{{ post.url }}" target="_blank">Permalink</a>
+    </p>
+    {% endif %}
     {% if post.id is not empty %}
     <p>
         <a href="{{ path('posts_delete', {id: post.id}) }}" class="delete">Delete this post</a>

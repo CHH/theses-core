@@ -1,3 +1,4 @@
 /vendor
 /composer.phar
+/_build
 bower_components

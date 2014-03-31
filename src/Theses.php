@@ -3,42 +3,56 @@
 namespace theses;
 
 use Stack\Builder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Theses extends \Pimple
 {
-    protected $engines = [];
     protected $plugins = [];
 
-    function __construct()
+    function __construct(array $values = [])
     {
         $this->initSharedServices();
+
+        foreach ($values as $key => $value) {
+            $this[$key] = $value;
+        }
     }
 
     function bootstrap()
     {
         $stack = new Builder;
 
-        $map = $this->engines;
-        $map['/admin'] = \Stack\lazy(function() use ($appRoot, $shared) {
-            $admin = new AdminApplication;
-            $admin['theses'] = $admin->share(function() {
-                return $this;
-            });
-
+        $map = [];
+        $map['/admin'] = \Stack\lazy(function() {
+            $admin = $this['admin.engine'];
             $admin->boot();
 
             return $admin;
         });
 
-        $stack->push(Stack\UrlMap::class, $map);
+        $stack->push(\Stack\UrlMap::class, $map);
 
-        $frontend = new FrontendApplication;
-        $frontend['theses'] = $frontend->share(function() {
-            return $this;
+        $frontend = \Stack\lazy(function() {
+            $frontend = $this['frontend.engine'];
+
+            // Load config in its own scope
+            call_user_func(function($app) {
+                require($this['config_file']);
+            }, $this);
+
+            $frontend->boot();
+
+            return $frontend;
         });
-        $frontend->boot();
+
+        $this->bootPlugins();
 
         return $stack->resolve($frontend);
+    }
+
+    function run()
+    {
+        \Stack\run($this->bootstrap());
     }
 
     function usePlugin(plugin\Plugin $plugin)
@@ -47,17 +61,51 @@ class Theses extends \Pimple
         return $this;
     }
 
-    function addEngine(\Silex\Application $app, $path)
+    function bootPlugins()
     {
-        $app['theses'] = $this;
-        $this->engines[$path] = $app;
-
-        return $this;
     }
 
     private function initSharedServices()
     {
         $app = $this;
+
+        $app['frontend.engine'] = $app->share(function() {
+            $frontend = new FrontendApplication;
+            $frontend['theses'] = $frontend->share(function() {
+                return $this;
+            });
+            return $frontend;
+        });
+
+        $app['admin.engine'] = $app->share(function() {
+            $admin = new AdminApplication;
+            $admin['theses'] = $admin->share(function() {
+                return $this;
+            });
+
+            return $admin;
+        });
+
+        $app['post.route'] = 'post';
+
+        $app['post.url_generator'] = $app->protect(function(Post $post) {
+            return $this['frontend.engine']->path($this['post.route'], ['slug' => $post->getSlug()]);
+        });
+
+        $app['post.factory'] = $app->protect(function() {
+            return new Post($this['dispatcher'], $this['post.url_generator']);
+        });
+
+        $app['posts'] = $app->share(function() use ($app) {
+            return new PostRepository(
+                $app['phpcr.session'],
+                $app['post.factory']
+            );
+        });
+
+        $this['site'] = $this->share(function() {
+            return new Site($this, $this['posts']);
+        });
 
         $app['db'] = $app->share(function() {
             $options = parse_url($_SERVER['DATABASE_URL']);
@@ -75,6 +123,17 @@ class Theses extends \Pimple
                 'password'  => @$options['pass'],
                 'dbname'    => trim($options['path'], '/'),
             ));
+        });
+
+        $app['converter.markdown'] = $app->share(function() {
+            return new MarkdownConverter(new \cebe\markdown\GithubMarkdown);
+        });
+
+        $app['dispatcher'] = $app->share(function() {
+            $dispatcher = new EventDispatcher;
+            $dispatcher->addSubscriber($this['converter.markdown']);
+
+            return $dispatcher;
         });
 
         $app['phpcr.workspace'] = 'default';

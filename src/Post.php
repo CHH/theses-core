@@ -3,20 +3,34 @@
 namespace theses;
 
 use PHPCR\NodeInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Post
 {
     public $id;
     public $slug;
     public $title;
-    public $content;
+    public $rawContent;
     public $createdAt;
     public $lastModified;
     public $publishedAt;
     public $userProperties = [];
 
-    function __construct()
+    protected $dispatcher;
+    protected $urlGenerator;
+
+    function __construct(
+        EventDispatcherInterface $dispatcher,
+        callable $urlGenerator = null
+    )
     {
+        $this->urlGenerator = $urlGenerator;
+        $this->dispatcher = $dispatcher;
+    }
+
+    function __get($property)
+    {
+        return $this->getCustomProperty($property);
     }
 
     function getId()
@@ -29,9 +43,17 @@ class Post
         return $this->title;
     }
 
+    function getRawContent()
+    {
+        return $this->rawContent;
+    }
+
     function getContent()
     {
-        return $this->content;
+        $event = new event\ConvertPostEvent($this);
+        $html = $this->dispatcher->dispatch(Events::POST_CONVERT, $event)->getContent();
+
+        return $html;
     }
 
     function getSlug()
@@ -59,6 +81,17 @@ class Post
         return $this->userProperties;
     }
 
+    function getCustomProperty($property, $default = null)
+    {
+        $custom = $this->getCustom();
+
+        if (array_key_exists($property, $custom)) {
+            return $custom[$property];
+        }
+
+        return $default;
+    }
+
     function publish()
     {
         $this->publishedAt = new \DateTime;
@@ -67,5 +100,31 @@ class Post
     function unpublish()
     {
         $this->publishedAt = null;
+    }
+
+    function getUrl()
+    {
+        $date = $this->getPublishedAt();
+
+        $permalink = sprintf("/%d/%d/%d/%s",
+            $date->format('Y'),
+            $date->format('m'),
+            $date->format('d'),
+            $this->getSlug()
+        );
+
+        return $permalink;
+    }
+
+    /**
+     * Returns the first paragraph of the content
+     * @return string
+     */
+    function getExcerpt()
+    {
+        $content = $this->getRawContent();
+        $content = ltrim($content);
+
+        return substr($content, 0, strpos($content, "\n"));
     }
 }
