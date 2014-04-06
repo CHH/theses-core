@@ -33,6 +33,17 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
                 $post->title = $data['title'];
                 $post->rawContent = $data['content'];
 
+                if (isset($data['custom'])) {
+                    $custom = [];
+                    foreach ($data['custom'] as $prop) {
+                        if (!empty($prop['property'])) {
+                            $custom[ $prop['property'] ] = $prop['value'];
+                        }
+                    }
+
+                    $post->userProperties = $custom;
+                }
+
                 $app['posts']->insert($post);
 
                 return $app->redirect($app->path('posts_edit', ['slug' => $post->getSlug()]));
@@ -43,7 +54,6 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
         })->bind('posts_create');
 
         $routes->match('/posts/{slug}/edit', function(Request $req, $slug) use ($app) {
-            //$session = $app['shared']['phpcr.session'];
             $post = $app['posts']->findBySlug($slug);;
 
             if ($req->isMethod('POST')) {
@@ -92,8 +102,23 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
         })->bind('posts_delete');
 
         $routes->get('/settings', function() use ($app) {
-            return $app['twig']->render('settings/index.html');
+            $options = $app['theses']['system_settings']->all();
+
+            $form = $app['form.factory']->createBuilder(new form\SystemSettingsType, $options)->getForm();
+
+            return $app['twig']->render('settings/index.html', [
+                'form' => $form->createView()
+            ]);
         })->bind('settings');
+
+        $routes->post('/settings/update', function(Request $request) use ($app) {
+            $form = $app['form.factory']->createBuilder(new form\SystemSettingsType)->getForm();
+            $form->handleRequest($request);
+
+            $app['theses']['system_settings']->set($form->getData());
+
+            return $app->redirect($app->path('settings'));
+        })->bind('settings_update');
 
         $routes->get('/users', function() use ($app) {
             $users = $app['theses']['db']->fetchAll('SELECT * FROM users ORDER BY users.id ASC');

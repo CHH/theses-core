@@ -412,19 +412,16 @@ a.delete {
   flex: 1;
   background: #f5f5f5;
 }
-#main-nav {
-  padding: 20px;
-}
 #main-nav > ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 #main-nav .user img.user-avatar {
   width: 3em;
-  border-radius: 9px;
+  border-radius: 9999px;
 }
 #main-nav .menu-entry {
-  margin: 0 0 2em;
   text-align: center;
 }
 #main-nav .menu-entry.active a {
@@ -434,6 +431,8 @@ a.delete {
   color: #29da25;
 }
 #main-nav .menu-entry a {
+  display: block;
+  padding: 0.8em 1.2em;
   -webkit-transition: 0.2s color;
   transition: 0.2s color;
   color: rgba(255, 255, 255, 0.6);
@@ -454,6 +453,44 @@ a.delete {
   display: block;
   font-size: 0.7em;
   font-weight: 300;
+}
+.secondary-nav {
+  background: #333333;
+  overflow-y: auto;
+}
+.secondary-nav > nav {
+  min-width: 200px;
+  padding-top: 2.33em;
+}
+.secondary-nav > nav h1 {
+  margin: 0 0 0.5em;
+  font-size: 1em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+}
+.secondary-nav > nav h1,
+.secondary-nav > nav a {
+  padding: 0.5em 1em;
+}
+.secondary-nav > nav a {
+  color: rgba(255, 255, 255, 0.8);
+}
+.secondary-nav > nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1em;
+}
+.secondary-nav > nav ul a {
+  display: block;
+  border: none;
+}
+.secondary-nav > nav ul a:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.secondary-nav > nav ul li.active a {
+  background: rgba(0, 0, 0, 0.2);
+  background: rgba(37, 196, 33, 0.8);
 }
 #quick-post nav > ul {
   display: inline-block;
@@ -636,7 +673,7 @@ table th {
 .pane .pane-title,
 .pane .pane-main,
 .pane .pane-footer {
-  padding: 0 4em;
+  padding: 0em 4em;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -716,6 +753,10 @@ table th {
 }
 .pane .pane-main.without-padding {
   padding: 0 !important;
+}
+.pane .pane-footer {
+  padding-top: 1em;
+  padding-bottom: 1em;
 }
 .post-list {
   list-style: none;

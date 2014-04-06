@@ -2,17 +2,15 @@
 
 namespace theses\event;
 
-use Symfony\Component\EventDispatcher\Event;
 use theses\Post;
 
-class ConvertPostEvent extends Event
+class ConvertPostEvent extends PostEvent
 {
-    protected $post;
     protected $content;
 
     function __construct(Post $post)
     {
-        $this->post = $post;
+        parent::__construct($post);
         $this->content = $post->getRawContent();
     }
 
@@ -24,10 +22,5 @@ class ConvertPostEvent extends Event
     function getContent()
     {
         return $this->content;
-    }
-
-    function getPost()
-    {
-        return $this->post;
     }
 }

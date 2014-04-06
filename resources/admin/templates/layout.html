@@ -33,9 +33,22 @@
                             </a>
                         </li>
                     {% endfor %}
+
+                        <li class="menu-entry">
+                            <a href="/admin/logout">
+                                <i class="menu-icon fa fa-power-off"></i>
+                                <span class="menu-label">Logout</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
             </header>
+
+            <section class="secondary-nav">
+                {% block secondary_nav %}
+                {% endblock %}
+            </section>
+
             <main id="main-content">
                 {% block content %}
                 {% endblock %}

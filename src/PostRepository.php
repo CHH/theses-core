@@ -7,15 +7,26 @@ use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
 use PHPCR\Util\NodeHelper;
 use iter;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PostRepository implements \IteratorAggregate
 {
-    protected $session;
+    const PERMALINK_DATE_TITLE = 1;
+    const PERMALINK_TITLE_ONLY = 2;
 
-    function __construct(SessionInterface $session, callable $postFactory)
+    protected $session;
+    protected $factory;
+    protected $dispatcher;
+
+    function __construct(
+        SessionInterface $session,
+        callable $postFactory,
+        EventDispatcherInterface $dispatcher
+    )
     {
         $this->session = $session;
         $this->factory = $postFactory;
+        $this->dispatcher = $dispatcher;
     }
 
     function create()
@@ -70,6 +81,8 @@ class PostRepository implements \IteratorAggregate
 
     function insert(Post $post)
     {
+        $this->dispatcher->dispatch(Events::POST_BEFORE_INSERT, new event\PostEvent($post));
+
         $posts = NodeHelper::createPath($this->session, '/posts');
 
         $post->slug = (new \Cocur\Slugify\Slugify)->slugify($post->getTitle());
@@ -86,12 +99,19 @@ class PostRepository implements \IteratorAggregate
 
         $this->session->save();
 
-        $post->createdAt = $node->getPropertyValue('jcr:created');
+        $this->updateUserProperties($node, $post->getCustom());
+
         $post->id = $node->getPropertyValue('jcr:uuid');
+        $post->createdAt = $node->getPropertyValue('jcr:created');
+        $post->lastModified = $node->getPropertyValue('jcr:lastModified');
+
+        $this->dispatcher->dispatch(Events::POST_INSERT, new event\PostEvent($post));
     }
 
     function update(Post $post)
     {
+        $this->dispatcher->dispatch(Events::POST_BEFORE_SAVE, new event\PostEvent($post));
+
         $node = $this->session->getNodeByIdentifier($post->id);
 
         if ($post->slug !== $node->getName()) {
@@ -102,9 +122,28 @@ class PostRepository implements \IteratorAggregate
         $node->setProperty('title', $post->title);
         $node->setProperty('content', $post->content);
 
+        $this->updateUserProperties($node, $post->getCustom());
+
+        $this->session->save();
+
+        if ($post->publishedAt !== null) {
+            $this->createPermalink($post);
+        }
+
+        $this->dispatcher->dispatch(Events::POST_AFTER_SAVE, new event\PostEvent($post));
+    }
+
+    function regeneratePermalinks()
+    {
+        foreach ($this->findAll() as $post) {
+            $this->createPermalink($post);
+        }
+    }
+
+    private function updateUserProperties(NodeInterface $node, array $customProperties)
+    {
         $custom = NodeHelper::createPath($this->session, $node->getPath().'/user_properties');
 
-        $customProperties = $post->userProperties;
         $i = 0;
         $existingProperties = iterator_to_array($custom->getNodes(), false);
 
@@ -129,17 +168,6 @@ class PostRepository implements \IteratorAggregate
         }
 
         $this->session->save();
-
-        if ($post->publishedAt !== null) {
-            $this->createPermalink($post);
-        }
-    }
-
-    function regeneratePermalinks()
-    {
-        foreach ($this->findAll() as $post) {
-            $this->createPermalink($post);
-        }
     }
 
     private function createPermalink(Post $post)

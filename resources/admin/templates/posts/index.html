@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+
 {% block content %}
 <div class="pane">
     <div class="pane-title">
@@ -28,14 +29,12 @@
                     </section>
                     <footer>
                         <div class="post-meta">
-                            {% if post.createdAt %}
                             Last updated {{ post.lastModified | date('M d Y') }}
-                            {% endif %}
 
                             {% if post.publishedAt|default('') %}
-                            Published at {{ post.publishedAt | date('M d Y') }}
+                            • Published at {{ post.publishedAt | date('M d Y') }}
                             {% else %}
-                            Not published yet
+                            • Not published yet
                             {% endif %}
                         </div>
 

@@ -30,10 +30,32 @@ class AdminApplication extends \Silex\Application
                 'label' => 'Settings',
                 'icon' => 'cogs'
             ],
-            [
-                'url' => '/admin/logout',
-                'label' => 'Logout',
-                'icon' => 'power-off'
+        ];
+
+        $app['menu.settings'] = [
+            'core' => [
+                'label' => 'Core',
+                'items' => [
+                    [
+                        'label' => 'General',
+                        'route' => 'settings'
+                    ],
+                    [
+                        'label' => 'Media',
+                        'url' => ''
+                    ]
+                ]
+            ],
+            // Section for plugin settings panels
+            'plugins' => [
+                'label' => 'Plugins',
+                'items' => [
+                    // Sample items
+                    [
+                        'label' => 'S3',
+                        'url' => ''
+                    ]
+                ]
             ]
         ];
 

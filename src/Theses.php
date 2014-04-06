@@ -35,15 +35,15 @@ class Theses extends \Pimple
         $frontend = \Stack\lazy(function() {
             $frontend = $this['frontend.engine'];
 
-            // Load config in its own scope
-            call_user_func(function($app) {
-                require($this['config_file']);
-            }, $this);
-
             $frontend->boot();
 
             return $frontend;
         });
+
+        // Load config in its own scope
+        call_user_func(function($app) {
+            require($this['config_file']);
+        }, $this);
 
         $this->bootPlugins();
 
@@ -55,14 +55,30 @@ class Theses extends \Pimple
         \Stack\run($this->bootstrap());
     }
 
-    function usePlugin(plugin\Plugin $plugin)
+    function on($event, $listener)
+    {
+        $this['dispatcher']->addListener($event, $listener);
+
+        return $this;
+    }
+
+    function usePlugin(plugin\Plugin $plugin, array $parameters = [])
     {
         $this->plugins[] = $plugin;
+
+        $plugin->register($this);
+
+        foreach ($parameters as $param => $value) {
+            $this[$param] = $value;
+        }
+
         return $this;
     }
 
     function bootPlugins()
     {
+        foreach ($this->plugins as $plugin) {
+        }
     }
 
     private function initSharedServices()
@@ -96,10 +112,24 @@ class Theses extends \Pimple
             return new Post($this['dispatcher'], $this['post.url_generator']);
         });
 
+        $app['system_settings.defaults'] = [
+            'siteUrl' => 'http://localhost',
+            'permalinkStrategy' => PostRepository::PERMALINK_DATE_TITLE,
+        ];
+
+        $app['system_settings'] = $app->share(function() {
+            return $this['settings_factory']('system', $this['system_settings.defaults']);
+        });
+
+        $app['settings_factory'] = $app->protect(function($namespace, array $defaults = []) {
+            return new SettingsManager($this['phpcr.session'], $namespace, $defaults);
+        });
+
         $app['posts'] = $app->share(function() use ($app) {
             return new PostRepository(
                 $app['phpcr.session'],
-                $app['post.factory']
+                $app['post.factory'],
+                $app['dispatcher']
             );
         });
 

@@ -95,11 +95,13 @@ class Post
     function publish()
     {
         $this->publishedAt = new \DateTime;
+        $this->dispatcher->dispatch(Events::POST_PUBLISH, new event\PostEvent($this));
     }
 
     function unpublish()
     {
         $this->publishedAt = null;
+        $this->dispatcher->dispatch(Events::POST_UNPUBLISH, new event\PostEvent($this));
     }
 
     function getUrl()
@@ -126,5 +128,11 @@ class Post
         $content = ltrim($content);
 
         return substr($content, 0, strpos($content, "\n"));
+    }
+
+    function on($event, callable $listener)
+    {
+        $this->dispatcher->addListener($event, $listener);
+        return $this;
     }
 }
