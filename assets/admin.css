@@ -532,9 +532,21 @@ a.delete {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  -webkit-transform: scale(1);
+  -ms-transform: scale(1);
+  transform: scale(1);
 }
 .btn.btn-delete {
   color: #e9282a;
+}
+.btn:active {
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  -webkit-transform: scale(0.98);
+  -ms-transform: scale(0.98);
+  transform: scale(0.98);
 }
 .btn:hover {
   border-color: rgba(0, 0, 0, 0.2);

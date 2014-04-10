@@ -1,7 +1,7 @@
-{% extends "settings/settings_layout.html" %}
+{% extends "settings_pane.html" %}
 {% block pane_title %}
     <h1>Twitter Settings</h1>
-    {% if twitterUser is empty %}
+    {% if twitterUser.error is defined %}
     <form class="pane-actions" method="post" action="{{ path('twitter_connect') }}">
         <button type="submit" name="connect" class="btn btn-primary">
             Connect with Twitter
@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block pane_main %}
-    {% if twitterUser is not empty %}
+    {% if twitterUser.error is not defined  %}
     <div class="twitter-user">
         <p>
             Connected as <a href="{{ twitterUser['url']|default('') }}">{{ twitterUser.screen_name }}</a>.
@@ -22,7 +22,7 @@
     </div>
     {% endif %}
 
-    <form id="twitter-settings" method="post" action="{{ path('twitter_settings_save') }}">
+    <form novalidate id="twitter-settings" method="post" action="{{ path('twitter_settings_save') }}">
         {{ form_widget(settings) }}
     </form>
 {% endblock %}

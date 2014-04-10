@@ -24,12 +24,19 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    transition: 0.5s;
+    transform: scale(1);
 
     &.btn-delete {
         color: @btn-delete-color;
 
         &:hover {
         }
+    }
+
+    &:active {
+        transition: 0.5s;
+        transform: scale(0.98);
     }
 
     &:hover {

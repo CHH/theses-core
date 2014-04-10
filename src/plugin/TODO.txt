@@ -1,7 +1,5 @@
 TODO:
 
-- Give each plugin its own unique settings namespace? Accessible with
-  $plugin->getOption(), ->setOption()?
 - Provide a framework for easier definition of settings panes for
   plugins, with automatic form generation from a definition and saving to the plugin
   settings namespace
@@ -11,8 +9,4 @@ TODO:
   - Post route which saves each valid form field to the plugin's
     settings in PHPCR
 - Easier building of admin panes
-- Make admin navigation mutable by plugins (maybe a method or
-  action/hook? `getMenuOptions()`?)
-- Add a pattern for second-level navigation, e.g. for sub panes in
-  Settings
 

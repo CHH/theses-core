@@ -43,6 +43,10 @@ class AdminApplication extends \Silex\Application
                     [
                         'label' => 'Media',
                         'url' => ''
+                    ],
+                    [
+                        'label' => 'Users',
+                        'route' => 'users'
                     ]
                 ]
             ],

@@ -21,6 +21,8 @@ class TwitterPlugin extends Plugin
             'enabled' => true
         ]);
 
+        $core->addSettingsMenuEntry('Twitter', ['route' => 'twitter_settings']);
+
         $core['twitter.app'] = $core->share(function() use ($core, $settings) {
             $config = $core['twitter.config'];
 
@@ -72,7 +74,7 @@ class TwitterPlugin extends Plugin
 
                 $admin->get('/settings/twitter', function(Request $request) use ($admin, $core, $settings) {
                     return $admin['twig']->render('@twitter/settings.html', [
-                        'twitterUser' => $core['twitter.app']->getUser(),
+                        'twitterUser' => $core['twitter.app']->getCredentials(),
                         'settings' => $admin['twitter.settings.form']($settings->all())->getForm()->createView(),
                     ]);
                 })->bind('twitter_settings');
@@ -106,30 +108,13 @@ class TwitterPlugin extends Plugin
                 });
 
                 $admin->post('/settings/twitter/save', function(Request $request) use ($admin, $core, $settings) {
-                    $form = $admin['twitter.settings.form']($request->get('form'))->getForm();
+                    $form = $admin['twitter.settings.form']($settings->all())->getForm();
                     $form->handleRequest($request);
 
                     $settings->set($form->getData());
 
                     return $admin->redirect($admin->path('twitter_settings'));
                 })->bind('twitter_settings_save');
-
-                /*
-                $menu = $admin['menu'];
-                $menu[] = [
-                    'icon' => 'twitter',
-                    'label' => 'Twitter',
-                    'route' => 'twitter_settings'
-                ];
-                $admin['menu'] = $menu;
-                 */
-
-                $menu = $admin['menu.settings'];
-                $menu['plugins']['items'][] = [
-                    'label' => 'Twitter',
-                    'route' => 'twitter_settings'
-                ];
-                $admin['menu.settings'] = $menu;
 
                 return $admin;
             })

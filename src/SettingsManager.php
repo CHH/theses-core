@@ -23,6 +23,12 @@ class SettingsManager
         return NodeHelper::createPath($this->session, '/theses/settings/' . $this->namespace);
     }
 
+    /**
+     * Set one or many settings
+     *
+     * @param string|array $spec Setting name as string or an array of settings
+     * @param mixed $value
+     */
     function set($spec, $value = null)
     {
         $node = $this->getNode();
@@ -36,15 +42,23 @@ class SettingsManager
         }
 
         $this->session->save();
-
-        return $this;
     }
 
+    /**
+     * Returns all settings as an array of setting-value pairs
+     *
+     * @return array
+     */
     function all()
     {
-        return $this->getNode()->getPropertiesValues() + $this->defaults;
+        $exclude = ['jcr:primaryType'];
+
+        return array_diff_key($this->getNode()->getPropertiesValues(), array_flip($exclude)) + $this->defaults;
     }
 
+    /**
+     * Safely get a setting with default
+     */
     function get($option, $default = null)
     {
         $options = $this->getNode();

@@ -62,6 +62,44 @@ class Theses extends \Pimple
         return $this;
     }
 
+    function addAdminMenuEntry($label, array $options = [])
+    {
+        $entry = array_merge(
+            ['label' => $label, 'icon' => ''],
+            $options
+        );
+
+        $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($entry) {
+            $menu = $admin['menu'];
+            $menu[] = $entry;
+            $admin['menu'] = $menu;
+
+            return $admin;
+        }));
+
+        return $this;
+    }
+
+    function addSettingsPane()
+    {
+    }
+
+    function addSettingsMenuEntry($label, array $options = [])
+    {
+        $entry = array_merge(['label' => $label, 'section' => 'plugins'], $options);
+
+        $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($entry) {
+            $menu = $admin['menu.settings'];
+            $menu[$entry['section']]['items'][] = $entry;
+
+            $admin['menu.settings'] = $menu;
+
+            return $admin;
+        }));
+
+        return $this;
+    }
+
     function usePlugin(plugin\Plugin $plugin, array $parameters = [])
     {
         $this->plugins[] = $plugin;
@@ -98,7 +136,6 @@ class Theses extends \Pimple
             $admin['theses'] = $admin->share(function() {
                 return $this;
             });
-
             return $admin;
         });
 
@@ -140,6 +177,8 @@ class Theses extends \Pimple
         $app['db'] = $app->share(function() {
             $options = parse_url($_SERVER['DATABASE_URL']);
 
+            // Compatibility with Heroku Postgres which uses postgres:// schemes
+            // in database URLs
             if ($options['scheme'] === 'postgres') {
                 $driver = 'pdo_pgsql';
             } else {

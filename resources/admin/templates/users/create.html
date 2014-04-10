@@ -1,10 +1,15 @@
-{% extends "pane.html" %}
+{% extends "settings_pane.html" %}
 {% block pane_title %}
 <h1>Create User</h1>
 {% endblock %}
 
 {% block pane_main %}
-<form method="post" action="{{ path('user_create') }}">
+<form id="user_create_form" method="post" action="{{ path('user_create') }}">
     {% include "users/_editor.html" %}
 </form>
+{% endblock %}
+
+{% block pane_footer %}
+<button type="submit" class="btn btn-primary" form="user_create_form">Save</button>
+<a href="{{ path('users') }}">Nevermind</a>
 {% endblock %}
