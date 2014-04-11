@@ -1,13 +1,14 @@
-@btn-primary-color: @color-primary;
-@btn-primary-background: transparent;
+@btn-color: @color-secondary;
+@btn-primary-color: contrast(@color-primary);
+@btn-primary-background: @color-primary;
 @btn-delete-color: #e9282a;
 
 .btn,
 .btn-borderless {
     display: inline-block;
-    padding: 0.5em 1em;
+    padding: 0.2em 0.8em;
     text-decoration: none;
-    color: @color-btn;
+    color: @btn-color;
     box-sizing: border-box;
     font-weight: 600;
 }
@@ -19,12 +20,12 @@
 }
 
 .btn {
-    border-radius: 5px;
-    border: 1px solid fade(black, 10%);
+    //border-radius: 5px;
+    border: 2px solid fade(black, 10%);
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    transition: 0.5s;
+    transition: 0.1s;
     transform: scale(1);
 
     &.btn-delete {
@@ -41,18 +42,25 @@
 
     &:hover {
         border-color: fade(black, 20%);
+        border-width: 2px;
     }
 
     &.btn-primary {
         background: @btn-primary-background;
         color: @btn-primary-color;
-        //color: contrast(@btn-primary-background, fade(black, 90%), fade(white, 90%));
-        transition: 0.2s background;
-        border: 2px solid @btn-primary-color;
+        border: 2px solid @btn-primary-background;
 
         &:hover {
             transition: 0.2s background;
             background: fade(@btn-primary-color, 5%);
+            background: lighten(@btn-primary-background, 10%);
+            border-color: lighten(@btn-primary-background, 10%);
+        }
+
+        &.btn-delete {
+            border-color: @color-destruct;
+            background: @color-destruct;
+            color: contrast(@color-destruct);
         }
     }
 }

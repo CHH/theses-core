@@ -1,0 +1,22 @@
+.block-notification {
+    display: flex;
+    flex-direction: columns;
+    flex-align: stretch;
+    margin: 0 0 1.5em;
+
+    > .fa {
+        align-self: center;
+        padding: 0 1em;
+        font-size: 2em;
+        color: fade(black, 60%);
+    }
+
+    > .message {
+        flex: 1;
+        font-weight: bold;
+    }
+
+    &.notice {
+        background: fade(black, 10%);
+    }
+}

@@ -515,9 +515,9 @@ a.delete {
 .btn,
 .btn-borderless {
   display: inline-block;
-  padding: 0.5em 1em;
+  padding: 0.2em 0.8em;
   text-decoration: none;
-  color: #25c421;
+  color: #2166c3;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -527,13 +527,12 @@ a.delete {
   font-weight: bold;
 }
 .btn {
-  border-radius: 5px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(0, 0, 0, 0.1);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  -webkit-transition: 0.5s;
-  transition: 0.5s;
+  -webkit-transition: 0.1s;
+  transition: 0.1s;
   -webkit-transform: scale(1);
   -ms-transform: scale(1);
   transform: scale(1);
@@ -550,18 +549,24 @@ a.delete {
 }
 .btn:hover {
   border-color: rgba(0, 0, 0, 0.2);
+  border-width: 2px;
 }
 .btn.btn-primary {
-  background: transparent;
-  color: #25c421;
-  -webkit-transition: 0.2s background;
-  transition: 0.2s background;
+  background: #25c421;
+  color: #ffffff;
   border: 2px solid #25c421;
 }
 .btn.btn-primary:hover {
   -webkit-transition: 0.2s background;
   transition: 0.2s background;
-  background: rgba(37, 196, 33, 0.05);
+  background: rgba(255, 255, 255, 0.05);
+  background: #3ede3a;
+  border-color: #3ede3a;
+}
+.btn.btn-primary.btn-delete {
+  border-color: #e92729;
+  background: #e92729;
+  color: #ffffff;
 }
 .btn-stretched {
   width: 100%;
@@ -581,24 +586,44 @@ a.delete {
   font-weight: 600;
 }
 form div {
-  margin: 0 0 1em;
+  margin: 0 0 1.5em;
 }
-form div label {
+form div > label {
   display: block;
   margin: 0 0 0.5em;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 600;
+  font-size: 0.8em;
 }
 form input[type=text],
 form input[type=password],
 form input[type=email],
 form textarea {
-  padding: 0.4em;
-  background: white;
-  border: 1px solid #e6e6e6;
   width: 100%;
+  padding: 0.4em 0.8em;
+  background: white;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border: 2px solid transparent;
+  font-weight: 400;
+  background: rgba(0, 0, 0, 0.1);
+}
+form input[type=text]:focus,
+form input[type=password]:focus,
+form input[type=email]:focus,
+form textarea:focus {
+  background: white;
+  outline: 2px solid #25c421;
+  outline: none;
+  border: 2px solid #25c421;
 }
 form input[type=radio] + label {
   display: inline;
   margin: 0 1em 0 0.5em;
+}
+.form-help {
+  font-style: italic;
+  font-weight: 300;
+  color: rgba(0, 0, 0, 0.5);
 }
 table {
   width: 100%;
@@ -662,6 +687,37 @@ table th {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
+}
+.block-notification {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: columns;
+  -ms-flex-direction: columns;
+  flex-direction: columns;
+  flex-align: stretch;
+  margin: 0 0 1.5em;
+}
+.block-notification > .fa {
+  -webkit-align-self: center;
+  -ms-flex-item-align: center;
+  align-self: center;
+  padding: 0 1em;
+  font-size: 2em;
+  color: rgba(0, 0, 0, 0.6);
+}
+.block-notification > .message {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  font-weight: bold;
+}
+.block-notification.notice {
+  background: rgba(0, 0, 0, 0.1);
 }
 /*
     Layouts within the pane
