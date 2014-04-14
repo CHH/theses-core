@@ -29,8 +29,7 @@
         "vlucas/phpdotenv": "~1.0",
         "nikic/iter": "~1.0",
         "ttools/ttools": "~2.0",
-        "zendframework/zendservice-twitter": "~2.0",
-        "zendframework/zendoauth": "~2.0"
+        "swiftmailer/swiftmailer"
     },
     "require-dev": {
         "phpunit/phpunit": "~3.7"

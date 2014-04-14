@@ -1,0 +1,38 @@
+{% extends 'settings_pane.html' %}
+
+{% block pane_title %}
+<h1>{{ pluginInfo.name }}</h1>
+{% endblock %}
+
+{% block pane_main %}
+<div class="plugin-info">
+    <table>
+        <tr>
+            <td>Version</td>
+            <td>{{ pluginInfo.version|default('No version specified') }}</td>
+        </tr>
+        {% if pluginInfo.homepage is defined %}
+        <tr>
+            <td>Homepage</td>
+            <td><a href="{{ pluginInfo.homepage }}">{{ pluginInfo.homepage }}</a></td>
+        </tr>
+        {% endif %}
+        {% if pluginInfo.author is defined %}
+        <tr>
+            <td>Author</td>
+            <td>
+                <a href="{{ pluginInfo.author.homepage|default('') }}">{{ pluginInfo.author.name }}</a>
+                (<a href="mailto:{{ pluginInfo.author.email }}">{{ pluginInfo.author.email }}</a>)
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+</div>
+<form id="{{ pluginSlug }}_settings" action="{{ path(pluginRoute) }}" method="post">
+    {{ form_widget(form) }}
+</form>
+{% endblock %}
+
+{% block pane_footer %}
+<button class="btn btn-primary" type="submit" form="{{ pluginSlug }}_settings">Save</button>
+{% endblock %}

@@ -58,14 +58,18 @@
         .pane-title {
             display: flex;
             align-content: stretch;
-            justify-content: space-between;
+            //justify-content: space-between;
 
             > h1 {
-                flex: 1;
+                //flex: 1;
+                align-self: center;
             }
 
             .pane-actions {
+                margin-left: 2em;
                 margin-top: 0;
+                flex: 1;
+                align-self: center;
             }
         }
     }
@@ -84,5 +88,12 @@
     .pane-footer {
         padding-top: 1em;
         padding-bottom: 1em;
+        background: fade(black, 5%);
     }
+}
+
+.plugin-info {
+    padding: 0 0 1.5em;
+    margin: 0 0 1.5em;
+    border-bottom: 2px solid fade(black, 10%);
 }

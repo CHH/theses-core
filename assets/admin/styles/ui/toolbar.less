@@ -1,8 +1,21 @@
 .toolbar {
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
     margin: 0 0 0 -20px;
+    background: fade(black, 5%);
+    padding: 0.5em;
+
+    &.toolbar-light {
+        background: none;
+
+        .toolbar-btn {
+            color: white;
+
+            .toolbar-btn-icon {
+                border-color: white;
+            }
+        }
+    }
 
     &.stretch-childs {
         align-items: stretch;
@@ -12,6 +25,26 @@
     > * {
         //align-self: stretch;
         margin: 0 0 10px 20px;
+    }
+
+    .toolbar-btn {
+        border: none;
+        color: @color-secondary;
+
+        .toolbar-btn-icon {
+            font-size: 1em;
+            margin-right: 0.2em;
+            border: 2px solid @color-secondary;
+            padding: 0.3em 0.6em;
+            font-size: 1.2em;
+            border-radius: 9999px;
+            line-height: 1;
+
+            > .fa {
+                color: @color-secondary;
+                line-height: 1;
+            }
+        }
     }
 
     .toolbar-spacer {

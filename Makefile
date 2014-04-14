@@ -19,7 +19,7 @@ build-setup:
 assets: assets/admin.js assets/admin.css
 
 watch:
-	watch --interval=5 make assets
+	watch --interval=2 make assets
 
 assets/admin.js: $(ADMIN_JS_SRC)
 	@echo "concat $(ADMIN_JS_SRC) > assets/admin.js"

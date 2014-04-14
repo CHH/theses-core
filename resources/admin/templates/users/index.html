@@ -1,8 +1,11 @@
 {% extends 'settings_pane.html' %}
 {% block pane_title %}
     <h1>Users</h1>
-    <div class="pane-actions">
-        <a href="{{path('user_create')}}" class="btn btn-primary">Create a new user</a>
+    <div class="pane-actions toolbar toolbar-light">
+        <a href="{{path('user_create')}}" class="toolbar-btn">
+            <span class="toolbar-btn-icon"><i class="fa fa-plus"></i></span>
+            Create new user
+        </a>
     </div>
 {% endblock %}
 

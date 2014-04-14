@@ -9,9 +9,12 @@
         {% block pane_main %}
         {% endblock %}
     </section>
+
+    {% set _footer = block('pane_footer') %}
+    {% if _footer is not empty %}
     <footer class="pane-footer">
-        {% block pane_footer %}
-        {% endblock %}
+        {{ _footer|raw }}
     </footer>
+    {% endif %}
 </div>
 {% endblock %}

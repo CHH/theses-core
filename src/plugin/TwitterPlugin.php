@@ -8,23 +8,37 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Twitter Plugin
- *
- * @plugin twitter
- * @author Christoph Hochstrasser <me@christophh.net>
- * @homepage http://github.com/CHH/theses-core
  */
 class TwitterPlugin extends Plugin
 {
+    static function getPluginInfo()
+    {
+        return [
+            'name' => 'Twitter',
+            'homepage' => 'http://github.com/CHH/theses-core',
+            'author' => [
+                'name' => 'Christoph Hochstrasser',
+                'homepage' => 'http://christophh.net',
+                'email' => 'hello@christophh.net',
+            ],
+        ];
+    }
+
     function register(Theses $core)
     {
         $settings = $core['settings_factory']('twitter', [
             'enabled' => true
         ]);
 
-        $core->addSettingsMenuEntry('Twitter', ['route' => 'twitter_settings']);
+        $core->addSettingsMenuEntry(static::getPluginInfo()['name'], ['route' => 'twitter_settings']);
 
         $core['twitter.app'] = $core->share(function() use ($core, $settings) {
-            $config = $core['twitter.config'];
+            $defaults = [
+                'consumer_key' => $_SERVER['TWITTER_CONSUMER_KEY'],
+                'consumer_secret' => $_SERVER['TWITTER_CONSUMER_SECRET'],
+            ];
+
+            $config = array_merge($defaults, isset($core['twitter.config']) ? $core['twitter.config'] : []);
 
             if ($settings->get('accessToken')) {
                 $config['access_token'] = $settings->get('accessToken');
@@ -74,6 +88,7 @@ class TwitterPlugin extends Plugin
 
                 $admin->get('/settings/twitter', function(Request $request) use ($admin, $core, $settings) {
                     return $admin['twig']->render('@twitter/settings.html', [
+                        'pluginInfo' => static::getPluginInfo(),
                         'twitterUser' => $core['twitter.app']->getCredentials(),
                         'settings' => $admin['twitter.settings.form']($settings->all())->getForm()->createView(),
                     ]);

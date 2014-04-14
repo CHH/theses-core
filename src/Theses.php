@@ -4,6 +4,7 @@ namespace theses;
 
 use Stack\Builder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Request;
 
 class Theses extends \Pimple
 {
@@ -100,7 +101,7 @@ class Theses extends \Pimple
         return $this;
     }
 
-    function usePlugin(plugin\Plugin $plugin, array $parameters = [])
+    function usePlugin(plugin\PluginInterface $plugin, array $parameters = [])
     {
         $this->plugins[] = $plugin;
 
@@ -136,6 +137,51 @@ class Theses extends \Pimple
             $admin['theses'] = $admin->share(function() {
                 return $this;
             });
+
+            $slugify = new \Cocur\Slugify\Slugify;
+
+            foreach ($this->plugins as $plugin) {
+                if (!is_callable([$plugin, 'getSettings'])) {
+                    continue;
+                }
+
+                $info = $plugin::getPluginInfo();
+                $pluginSlug = $slugify->slugify($info['name']);
+                $pluginRoute = 'plugin_' . $pluginSlug;
+
+                $menu = $admin['menu.settings'];
+                $menu['plugins']['items'][] = [
+                    'label' => $info['name'],
+                    'route' => $pluginRoute,
+                ];
+                $admin['menu.settings'] = $menu;
+
+                $admin->match(
+                    "/settings/$pluginSlug",
+                    function(Request $request) use ($admin, $plugin, $pluginSlug, $pluginRoute) {
+                        $info = $plugin::getPluginInfo();
+                        $settings = $this['settings_factory']($info['name'], $plugin::getSettingsDefaults());
+
+                        $settingsForm = $plugin::getSettings($admin->form($settings->all()))->getForm();
+                        $settingsForm->handleRequest($request);
+
+                        if ($settingsForm->isValid()) {
+                            $data = $settingsForm->getData();
+                            $settings->set($data);
+
+                            return $admin->redirect($admin->path($pluginRoute));
+                        }
+
+                        return $admin['twig']->render('plugin_settings_pane.html', [
+                            'pluginSlug' => $pluginSlug,
+                            'form' => $settingsForm->createView(),
+                            'pluginInfo' => $info,
+                            'pluginRoute' => $pluginRoute,
+                        ]);
+                    }
+                )->bind($pluginRoute);
+            }
+
             return $admin;
         });
 

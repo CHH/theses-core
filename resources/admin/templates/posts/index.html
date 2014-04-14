@@ -5,12 +5,26 @@
     <div class="pane-title">
         <h1>Posts</h1>
 
-        <div class="pane-actions">
-            <a href="{{path('posts_create')}}" class="btn btn-primary">
+        <div class="pane-actions toolbar toolbar-light">
+            <a href="{{path('posts_create')}}" class="toolbar-btn btn btn-primary btn-inverted">
                 Create Post
             </a>
         </div>
     </div>
+
+    <!--
+    <div class="toolbar">
+        <a href="{{path('user_create')}}" class="toolbar-btn">
+            <i class="fa fa-bullhorn"></i>
+            Publish selected
+        </a>
+        <a href="{{path('user_create')}}" class="toolbar-btn">
+            <i class="fa fa-times-circle-o"></i>
+            Clear selection
+        </a>
+        <span class="spacer"></span>
+    </div>
+    -->
 
     <div class="pane-main without-padding">
         <ol class="post-list">

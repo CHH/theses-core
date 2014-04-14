@@ -58,6 +58,12 @@
             padding: 0.5em;
             color: contrast(@bg-color);
 
+            &:focus {
+                border: none;
+                background: transparent;
+                background: fade(white, 15%);
+            }
+
             .input-placeholder({ color: fade(black, 20%); });
         }
 
