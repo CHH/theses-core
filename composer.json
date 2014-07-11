@@ -30,7 +30,7 @@
         "nikic/iter": "~1.0",
         "ttools/ttools": "~2.0",
         "swiftmailer/swiftmailer": "~5.0",
-        "knplabs/knp-menu": "~2.0@dev"
+        "knplabs/knp-menu": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "~3.7"
