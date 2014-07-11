@@ -108,8 +108,8 @@ class Theses extends \Pimple
         if (is_dir($viewsPath)) {
             $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($rc, $viewsPath) {
                 $admin['twig.loader.filesystem'] = $admin->share(
-                    $admin->extend('twig.loader.filesystem', function($loader) {
-                        $loader->addPath(__DIR__ . $viewsPath, $rc->getShortName());
+                    $admin->extend('twig.loader.filesystem', function($loader) use ($rc, $viewsPath) {
+                        $loader->addPath($viewsPath, $rc->getShortName());
                         return $loader;
                     })
                 );
