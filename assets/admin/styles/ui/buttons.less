@@ -26,7 +26,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    transition: 0.1s;
+    transition: 0.1s all;
     transform: scale(1);
 
     &.btn-delete {
@@ -52,10 +52,8 @@
         border: 2px solid @btn-primary-background;
 
         &:hover {
-            transition: 0.2s background;
-            background: fade(@btn-primary-color, 5%);
-            background: lighten(@btn-primary-background, 10%);
-            border-color: lighten(@btn-primary-background, 10%);
+            transition: 0.2s all;
+            outline: 2px solid darken(@btn-primary-background, 20%);
         }
 
         &.btn-delete {

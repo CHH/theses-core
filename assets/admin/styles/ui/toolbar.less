@@ -2,17 +2,20 @@
     display: flex;
     flex-wrap: wrap;
     margin: 0 0 0 -20px;
-    background: fade(black, 5%);
-    padding: 0.5em;
+    //background: fade(black, 5%);
+    //padding: 0.5em;
 
     &.toolbar-light {
         background: none;
 
         .toolbar-btn {
             color: white;
+            border-color: white;
 
             .toolbar-btn-icon {
-                border-color: white;
+                > .fa {
+                    color: white;
+                }
             }
         }
     }
@@ -34,10 +37,7 @@
         .toolbar-btn-icon {
             font-size: 1em;
             margin-right: 0.2em;
-            border: 2px solid @color-secondary;
-            padding: 0.3em 0.6em;
             font-size: 1.2em;
-            border-radius: 9999px;
             line-height: 1;
 
             > .fa {

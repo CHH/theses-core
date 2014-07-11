@@ -11,7 +11,7 @@ class ConvertPostEvent extends PostEvent
     function __construct(Post $post)
     {
         parent::__construct($post);
-        $this->content = $post->getRawContent();
+        $this->content = $post->getContent();
     }
 
     function setContent($content)

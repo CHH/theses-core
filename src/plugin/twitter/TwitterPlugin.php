@@ -1,6 +1,6 @@
 <?php
 
-namespace theses\plugin;
+namespace theses\plugin\twitter;
 
 use theses\Events;
 use theses\Theses;
@@ -78,13 +78,6 @@ class TwitterPlugin implements Plugin
 
         $core['admin.engine'] = $core->share(
             $core->extend('admin.engine', function($admin) use ($core, $settings) {
-                $admin['twig.loader.filesystem'] = $admin->share(
-                    $admin->extend('twig.loader.filesystem', function($loader) {
-                        $loader->addPath(__DIR__ . '/resources/twitter', 'twitter');
-                        return $loader;
-                    })
-                );
-
                 $admin['twitter.settings.form'] = $admin->protect(function($data) use ($admin) {
                     return $admin->form($data)
                         ->add('enabled', 'checkbox', ['label' => 'Update Twitter status when a post is published'])
@@ -92,7 +85,7 @@ class TwitterPlugin implements Plugin
                 });
 
                 $admin->get('/settings/twitter', function(Request $request) use ($admin, $core, $settings) {
-                    return $admin['twig']->render('@twitter/settings.html', [
+                    return $admin['twig']->render('@TwitterPlugin/settings.html', [
                         'pluginInfo' => static::getPluginInfo(),
                         'twitterUser' => $core['twitter.app']->getCredentials(),
                         'settings' => $admin['twitter.settings.form']($settings->all())->getForm()->createView(),

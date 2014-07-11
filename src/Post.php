@@ -7,30 +7,45 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Post
 {
-    public $id;
-    public $slug;
-    public $title;
-    public $rawContent;
-    public $createdAt;
-    public $lastModified;
-    public $publishedAt;
-    public $userProperties = [];
+    protected $id;
+    protected $slug;
+    protected $title;
+    protected $content;
+    protected $createdAt;
+    protected $lastModified;
+    protected $publishedAt;
+    protected $userProperties = [];
 
     protected $dispatcher;
     protected $urlGenerator;
 
+    // Todo: remove dependency on Event Dispatcher by shifting responsibility to
+    //       PostRepository class, or a possible additional helper class. Only publish/unpublish
+    //       are currently left using the Event Dispatcher.
     function __construct(
-        EventDispatcherInterface $dispatcher,
-        callable $urlGenerator = null
+        array $attributes = [],
+        EventDispatcherInterface $dispatcher
     )
     {
-        $this->urlGenerator = $urlGenerator;
+        if ($attributes) {
+            $this->modify($attributes);
+        }
+
         $this->dispatcher = $dispatcher;
     }
 
     function __get($property)
     {
         return $this->getCustomProperty($property);
+    }
+
+    function modify(array $attributes)
+    {
+        foreach ($attributes as $attribute => $value) {
+            if (property_exists(get_called_class(), $attribute)) {
+                $this->$attribute = $value;
+            }
+        }
     }
 
     function getId()
@@ -43,17 +58,9 @@ class Post
         return $this->title;
     }
 
-    function getRawContent()
-    {
-        return $this->rawContent;
-    }
-
     function getContent()
     {
-        $event = new event\ConvertPostEvent($this);
-        $html = $this->dispatcher->dispatch(Events::POST_CONVERT, $event)->getContent();
-
-        return $html;
+        return $this->content;
     }
 
     function getSlug()
@@ -104,6 +111,9 @@ class Post
         $this->dispatcher->dispatch(Events::POST_UNPUBLISH, new event\PostEvent($this));
     }
 
+    /**
+     * @deprecated
+     */
     function getUrl()
     {
         $date = $this->getPublishedAt();
@@ -124,7 +134,7 @@ class Post
      */
     function getExcerpt()
     {
-        $content = $this->getRawContent();
+        $content = $this->getContent();
         $content = ltrim($content);
 
         return substr($content, 0, strpos($content, "\n"));

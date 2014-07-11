@@ -16504,6 +16504,7 @@ window.$ === undefined && (window.$ = Zepto)
         }
         return _results;
       }).call(this)), R.a({
+        href: "#",
         onClick: this.handleAddProperty
       }, "+ Add property"));
     },

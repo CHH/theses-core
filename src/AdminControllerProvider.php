@@ -15,7 +15,29 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
         $routes = $app['controllers_factory'];
 
         $routes->get('/', function() use ($app) {
-            return $app['twig']->render("index.html");
+            $stream = [
+                [
+                    'type' => 'note',
+                    'title' => 'Lean PHP',
+                    'excerpt' => "Lorem ipsum",
+                    'icon' => 'comment-o'
+                ],
+                [
+                    'type' => 'link',
+                    'href' => 'http://xkcd.com',
+                    'title' => 'Most awesome comic site EVER',
+                    'description' => '',
+                    'icon' => 'share-square-o'
+                ],
+                [
+                    'type' => 'image',
+                    'image' => 'http://lorempixel.com/1920/1080/cats',
+                    'description' => 'So cute ;)',
+                    'icon' => 'picture-o'
+                ]
+            ];
+
+            return $app['twig']->render("index.html", compact('stream'));
         })->bind('dashboard');
 
         $routes->get('/posts', function() use ($app) {
@@ -32,8 +54,10 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
             if ($req->isMethod("POST")) {
                 $data = $req->get('post');
 
-                $post->title = $data['title'];
-                $post->rawContent = $data['content'];
+                $post->modify([
+                    'title' => $data['title'],
+                    'content' => $data['content'],
+                ]);
 
                 if (isset($data['custom'])) {
                     $custom = [];
@@ -43,7 +67,9 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
                         }
                     }
 
-                    $post->userProperties = $custom;
+                    $post->modify([
+                        'userProperties' => $custom
+                    ]);
                 }
 
                 if (empty($data['title'])) {
@@ -65,6 +91,7 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
 
             if ($req->isMethod('POST')) {
                 $data = $req->get('post');
+                $attributes = [];
 
                 if ($req->get('publish') !== null) {
                     $post->publish();
@@ -82,7 +109,7 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
                         }
                     }
 
-                    $post->userProperties = $custom;
+                    $attributes['userProperties'] = $custom;
                 }
 
                 if (empty($data['title'])) {
@@ -90,9 +117,11 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
                     goto redirect;
                 }
 
-                $post->title = $data['title'];
-                $post->content = $data['content'];
-                $post->slug = (new \Cocur\Slugify\Slugify)->slugify($post->title);
+                $attributes['title'] = $data['title'];
+                $attributes['content'] = $data['content'];
+                $attributes['slug'] = (new \Cocur\Slugify\Slugify)->slugify($attributes['title']);
+
+                $post->modify($attributes);
 
                 $app['posts']->update($post);
 

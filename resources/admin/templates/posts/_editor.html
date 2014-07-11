@@ -37,7 +37,7 @@
         <textarea required id="post-title" rows=1 cols=80 name="post[title]" placeholder="One weird trick …">{{ post.title }}</textarea>
     </div>
 
-    <textarea required name="post[content]" id="post-content" rows="10" cols="90">{% if post.rawContent is defined %}{{ post.rawContent }}{% endif %}</textarea>
+    <textarea required name="post[content]" id="post-content" rows="10" cols="90">{% if post.content is defined %}{{ post.content }}{% endif %}</textarea>
 
     <script>
         (function() {

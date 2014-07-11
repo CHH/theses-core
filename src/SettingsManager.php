@@ -51,9 +51,13 @@ class SettingsManager
      */
     function all()
     {
-        $exclude = ['jcr:primaryType'];
+        $properties = $this->getNode()->getPropertiesValues();
 
-        return array_diff_key($this->getNode()->getPropertiesValues(), array_flip($exclude)) + $this->defaults;
+        $allowedPropertyNames = array_filter(array_keys($properties), function($prop) {
+            return strpos($prop, 'jcr:', 0) === false;
+        });
+
+        return array_intersect_key($properties, array_flip($allowedPropertyNames)) + $this->defaults;
     }
 
     /**

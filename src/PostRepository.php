@@ -29,9 +29,9 @@ class PostRepository implements \IteratorAggregate
         $this->dispatcher = $dispatcher;
     }
 
-    function create()
+    function create(array $attributes = [])
     {
-        return call_user_func($this->factory);
+        return call_user_func($this->factory, $attributes);
     }
 
     function find($id)
@@ -74,6 +74,27 @@ class PostRepository implements \IteratorAggregate
         }
     }
 
+    function publish(Post $post)
+    {
+    }
+
+    function unpublish(Post $post)
+    {
+    }
+
+    /**
+     * Renders the post content to HTML
+     *
+     * @return string
+     */
+    function render(Post $post)
+    {
+        $event = new event\ConvertPostEvent($post);
+        $html = $this->dispatcher->dispatch(Events::POST_CONVERT, $event)->getContent();
+
+        return $html;
+    }
+
     function getIterator()
     {
         return $this->findAllPublished();
@@ -85,7 +106,9 @@ class PostRepository implements \IteratorAggregate
 
         $posts = NodeHelper::createPath($this->session, '/posts');
 
-        $post->slug = (new \Cocur\Slugify\Slugify)->slugify($post->getTitle());
+        $post->modify([
+            'slug' => (new \Cocur\Slugify\Slugify)->slugify($post->getTitle())
+        ]);
 
         $node = $posts->addNode($post->getSlug(), 'nt:unstructured');
 
@@ -95,15 +118,17 @@ class PostRepository implements \IteratorAggregate
 
         $node->setProperty('jcr:createdBy', 'Christoph');
         $node->setProperty('title', $post->getTitle());
-        $node->setProperty('content', $post->getRawContent());
+        $node->setProperty('content', $post->getContent());
 
         $this->session->save();
 
         $this->updateUserProperties($node, $post->getCustom());
 
-        $post->id = $node->getPropertyValue('jcr:uuid');
-        $post->createdAt = $node->getPropertyValue('jcr:created');
-        $post->lastModified = $node->getPropertyValue('jcr:lastModified');
+        $post->modify([
+            'id' => $node->getPropertyValue('jcr:uuid'),
+            'createdAt' => $node->getPropertyValue('jcr:created'),
+            'lastModified' => $node->getPropertyValue('jcr:lastModified'),
+        ]);
 
         $this->dispatcher->dispatch(Events::POST_INSERT, new event\PostEvent($post));
     }
@@ -112,21 +137,21 @@ class PostRepository implements \IteratorAggregate
     {
         $this->dispatcher->dispatch(Events::POST_BEFORE_SAVE, new event\PostEvent($post));
 
-        $node = $this->session->getNodeByIdentifier($post->id);
+        $node = $this->session->getNodeByIdentifier($post->getId());
 
-        if ($post->slug !== $node->getName()) {
-            $node->rename($post->slug);
+        if ($post->getSlug() !== $node->getName()) {
+            $node->rename($post->getSlug());
         }
 
-        $node->setProperty('publishedAt', $post->publishedAt);
-        $node->setProperty('title', $post->title);
-        $node->setProperty('content', $post->content);
+        $node->setProperty('publishedAt', $post->getPublishedAt());
+        $node->setProperty('title', $post->getTitle());
+        $node->setProperty('content', $post->getContent());
 
         $this->updateUserProperties($node, $post->getCustom());
 
         $this->session->save();
 
-        if ($post->publishedAt !== null) {
+        if ($post->getPublishedAt() !== null) {
             $this->createPermalink($post);
         }
 
@@ -182,17 +207,14 @@ class PostRepository implements \IteratorAggregate
 
     private function createFromNode(NodeInterface $node)
     {
-        $post = $this->create();
-        $post->id = $node->getIdentifier();
-        $post->userProperties = $this->getCustomPostProperties($node);
-        $post->title = $node->getPropertyValueWithDefault('title', '');
-        $post->rawContent = $node->getPropertyValueWithDefault('content', '');
-        $post->publishedAt = $node->getPropertyValueWithDefault('publishedAt', null);
-        $post->createdAt = $node->getPropertyValueWithDefault('jcr:created', null);
-        $post->lastModified = $node->getPropertyValueWithDefault('jcr:lastModified', null);
-        $post->slug = $node->getName();
+        $attributes = $node->getPropertiesValues();
+        $attributes['createdAt'] = $attributes['jcr:created'];
+        $attributes['lastModified'] = $attributes['jcr:lastModified'];
+        $attributes['slug'] = $node->getName();
+        $attributes['id'] = $node->getIdentifier();
+        $attributes['userProperties'] = $this->getCustomPostProperties($node);
 
-        return $post;
+        return $this->create($attributes);
     }
 
     private function getCustomPostProperties(NodeInterface $postNode)

@@ -4,6 +4,9 @@ namespace theses;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * TODO: Use KnpMenu for menus
+ */
 class AdminApplication extends \Silex\Application
 {
     use \Silex\Application\UrlGeneratorTrait;
@@ -53,13 +56,7 @@ class AdminApplication extends \Silex\Application
             // Section for plugin settings panels
             'plugins' => [
                 'label' => 'Plugins',
-                'items' => [
-                    // Sample items
-                    [
-                        'label' => 'S3',
-                        'url' => ''
-                    ]
-                ]
+                'items' => []
             ]
         ];
 

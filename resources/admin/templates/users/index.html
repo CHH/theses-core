@@ -2,8 +2,7 @@
 {% block pane_title %}
     <h1>Users</h1>
     <div class="pane-actions toolbar toolbar-light">
-        <a href="{{path('user_create')}}" class="toolbar-btn">
-            <span class="toolbar-btn-icon"><i class="fa fa-plus"></i></span>
+        <a href="{{path('user_create')}}" class="btn btn-inverted">
             Create new user
         </a>
     </div>
@@ -23,7 +22,7 @@
     <tbody>
         {% for user in users %}
         <tr>
-            <td><img src="{{ gravatar(user.email, {size: 96}) }}" height="48" alt="{{ user.email }}"></td>
+            <td style="text-align:center"><img src="{{ gravatar(user.email, {size: 96}) }}" height="48" alt="{{ user.email }}"></td>
             <td><a href="{{ path('user_edit', {id: user.id}) }}">{{user.username}}</a></td>
             <td>{{user.display_name}}</td>
             <td><a href="mailto:{{user.email}}">{{ user.email }}</a></td>

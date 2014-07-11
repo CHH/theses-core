@@ -35,7 +35,6 @@ class Theses extends \Pimple
 
         $frontend = \Stack\lazy(function() {
             $frontend = $this['frontend.engine'];
-
             $frontend->boot();
 
             return $frontend;
@@ -81,10 +80,6 @@ class Theses extends \Pimple
         return $this;
     }
 
-    function addSettingsPane()
-    {
-    }
-
     function addSettingsMenuEntry($label, array $options = [])
     {
         $entry = array_merge(['label' => $label, 'section' => 'plugins'], $options);
@@ -101,11 +96,26 @@ class Theses extends \Pimple
         return $this;
     }
 
-    function usePlugin(plugin\PluginInterface $plugin, array $parameters = [])
+    function usePlugin(plugin\Plugin $plugin, array $parameters = [])
     {
         $this->plugins[] = $plugin;
 
         $plugin->register($this);
+
+        $rc = new \ReflectionClass($plugin);
+        $viewsPath = dirname($rc->getFilename()) . '/Resources/views';
+
+        if (is_dir($viewsPath)) {
+            $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($rc, $viewsPath) {
+                $admin['twig.loader.filesystem'] = $admin->share(
+                    $admin->extend('twig.loader.filesystem', function($loader) {
+                        $loader->addPath(__DIR__ . $viewsPath, $rc->getShortName());
+                        return $loader;
+                    })
+                );
+                return $admin;
+            }));
+        }
 
         foreach ($parameters as $param => $value) {
             $this[$param] = $value;
@@ -138,48 +148,12 @@ class Theses extends \Pimple
                 return $this;
             });
 
-            $slugify = new \Cocur\Slugify\Slugify;
+            $plugins = array_filter($this->plugins, function($plugin) {
+                return $plugin instanceof plugin\SettingsEnabled;
+            });
 
-            foreach ($this->plugins as $plugin) {
-                if (!is_callable([$plugin, 'getSettings'])) {
-                    continue;
-                }
-
-                $info = $plugin::getPluginInfo();
-                $pluginSlug = $slugify->slugify($info['name']);
-                $pluginRoute = 'plugin_' . $pluginSlug;
-
-                $menu = $admin['menu.settings'];
-                $menu['plugins']['items'][] = [
-                    'label' => $info['name'],
-                    'route' => $pluginRoute,
-                ];
-                $admin['menu.settings'] = $menu;
-
-                $admin->match(
-                    "/settings/$pluginSlug",
-                    function(Request $request) use ($admin, $plugin, $pluginSlug, $pluginRoute) {
-                        $info = $plugin::getPluginInfo();
-                        $settings = $this['settings_factory']($info['name'], $plugin::getSettingsDefaults());
-
-                        $settingsForm = $plugin::getSettings($admin->form($settings->all()))->getForm();
-                        $settingsForm->handleRequest($request);
-
-                        if ($settingsForm->isValid()) {
-                            $data = $settingsForm->getData();
-                            $settings->set($data);
-
-                            return $admin->redirect($admin->path($pluginRoute));
-                        }
-
-                        return $admin['twig']->render('plugin_settings_pane.html', [
-                            'pluginSlug' => $pluginSlug,
-                            'form' => $settingsForm->createView(),
-                            'pluginInfo' => $info,
-                            'pluginRoute' => $pluginRoute,
-                        ]);
-                    }
-                )->bind($pluginRoute);
+            foreach ($plugins as $plugin) {
+                $this->initPluginSettings($admin, $plugin);
             }
 
             return $admin;
@@ -191,8 +165,8 @@ class Theses extends \Pimple
             return $this['frontend.engine']->path($this['post.route'], ['slug' => $post->getSlug()]);
         });
 
-        $app['post.factory'] = $app->protect(function() {
-            return new Post($this['dispatcher'], $this['post.url_generator']);
+        $app['post.factory'] = $app->protect(function(array $attributes = []) {
+            return new Post($attributes, $this['dispatcher'], $this['post.url_generator']);
         });
 
         $app['system_settings.defaults'] = [
@@ -263,5 +237,44 @@ class Theses extends \Pimple
         $app['phpcr.session'] = function () use ($app) {
             return $app['phpcr.repository']->login(new \PHPCR\SimpleCredentials(null, null), $app['phpcr.workspace']);
         };
+    }
+
+    private function initPluginSettings(AdminApplication $admin, plugin\Plugin $plugin)
+    {
+        $info = $plugin::getPluginInfo();
+        $pluginSlug = (new \Cocur\Slugify\Slugify)->slugify($info['name']);
+        $pluginRoute = 'plugin_' . $pluginSlug;
+
+        $menu = $admin['menu.settings'];
+        $menu['plugins']['items'][] = [
+            'label' => $info['name'],
+            'route' => $pluginRoute,
+        ];
+        $admin['menu.settings'] = $menu;
+
+        $admin->match(
+            "/settings/$pluginSlug",
+            function(Request $request) use ($admin, $plugin, $pluginSlug, $pluginRoute) {
+                $info = $plugin::getPluginInfo();
+                $settings = $this['settings_factory']($info['name'], $plugin::getSettingsDefaults() ?: []);
+
+                $settingsForm = $plugin::getSettings($admin->form($settings->all()))->getForm();
+                $settingsForm->handleRequest($request);
+
+                if ($settingsForm->isValid()) {
+                    $data = $settingsForm->getData();
+                    $settings->set($data);
+
+                    return $admin->redirect($admin->path($pluginRoute));
+                }
+
+                return $admin['twig']->render('plugin_settings_pane.html', [
+                    'pluginSlug' => $pluginSlug,
+                    'form' => $settingsForm->createView(),
+                    'pluginInfo' => $info,
+                    'pluginRoute' => $pluginRoute,
+                ]);
+            }
+        )->bind($pluginRoute);
     }
 }

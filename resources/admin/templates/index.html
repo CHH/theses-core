@@ -5,6 +5,40 @@
 {% endblock %}
 
 {% block pane_main %}
+    <section id="stream">
+        {% for post in stream %}
+        <article class="post">
+            <header class="post-info">
+                <i class="post-icon fa fa-{{ post.icon }}"></i>
+                <!--
+                <img class="author-avatar" src="{{ gravatar(app.user.email, {size: 128}) }}" />
+                -->
+            </header>
+            <div class="object">
+                <div class="preview {{ post.type }}">
+                    {% if post.type == "note" %}
+                    <h1 class="title">{{ post.title }}</h1>
+                    <div class="description">
+                        <p>{{ post.excerpt }}…</p>
+                    </div>
+                    {% elseif post.type == "link" %}
+                    <h1 class="title"><a href="{{ post.href }}">{{ post.title }}</a></h1>
+                    <div class="description">
+                        <p>{{ post.description }}</p>
+                    </div>
+                    {% elseif post.type == "image" %}
+                    <figure>
+                        <img src="{{ post.image }}">
+                        <figcaption class="description">
+                            {{ post.description|default('')|markdown }}
+                        </figcaption>
+                    </figure>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
 {% endblock %}
 
 {% block body_end %}

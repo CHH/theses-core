@@ -1,0 +1,58 @@
+#stream {
+    max-width: 45em;
+    margin: 0 auto;
+
+    .post {
+        display: flex;
+        flex-direction: columns;
+        flex-align: stretch;
+        margin: 0 0 2em;
+
+        .post-info {
+            text-align: center;
+            > img {
+                width: 64px;
+                border-radius: 9999px;
+            }
+
+            .post-icon {
+                width: 1.5em;
+                display: block;
+                font-size: 2em;
+                color: fade(black, 50%);
+            }
+        }
+
+        .object {
+            overflow: hidden;
+            box-shadow: 0 2px 1px fade(black, 5%);
+            //border: 1px solid fade(black, 10%);
+            border-radius: 4px;
+            background: white;
+            margin: 0 0 0 1em;
+            flex: 1;
+
+            .title, .description {
+                padding: 10px 20px;
+            }
+
+            .preview.note, .preview.link {
+            }
+
+            .note {
+            }
+
+            .link {
+            }
+
+            .image {
+                > figure {
+                    padding: 0; margin: 0;
+                }
+                img {
+                    max-width: 100%;
+                }
+            }
+        }
+    }
+}

@@ -22,8 +22,8 @@ watch:
 	watch --interval=2 make assets
 
 assets/admin.js: $(ADMIN_JS_SRC)
-	@echo "concat $(ADMIN_JS_SRC) > assets/admin.js"
-	@( for i in $(ADMIN_JS_SRC) ; do cat $$i ; echo ';' ; done ) >assets/admin.js
+	@echo "concat $(ADMIN_JS_SRC) > $@"
+	@( for i in $(ADMIN_JS_SRC) ; do cat $$i ; echo ';' ; done ) >$@
 
 assets/admin.css: assets/admin/styles/screen.less
 	lessc -M $< assets/admin.css > _build/admin.css.d

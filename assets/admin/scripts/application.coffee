@@ -96,7 +96,7 @@ exports.CustomPropertyList = React.createClass
                     R.li key: i,
                         R.input placeholder: "Property", className: "property", name: "post[custom][#{ i }][property]", type: "text", value: prop.property, onChange: (ev) => @changePropertyName(ev, i)
                         R.input placeholder: "Value", className: "value", name: "post[custom][#{ i }][value]", type: "text", value: prop.value, onChange: (ev) => @changePropertyValue(ev, i)
-            R.a onClick: @handleAddProperty, "+ Add property"
+            R.a href: "#", onClick: @handleAddProperty, "+ Add property"
     handleAddProperty: ->
         @setState({properties: @state.properties.concat([{property: "", value: ""}])})
     changePropertyName: (event, index) ->

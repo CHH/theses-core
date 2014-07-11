@@ -2,7 +2,11 @@
 
 namespace theses\plugin;
 
-class HelloWorldPlugin implements PluginInterface
+/**
+ * A simple demo plugin
+ */
+class HelloWorldPlugin
+    implements Plugin, SettingsEnabled
 {
     static function getPluginInfo()
     {
@@ -24,11 +28,11 @@ class HelloWorldPlugin implements PluginInterface
         ];
     }
 
-    static function getSettings($builder)
+    static function getSettings($form)
     {
-        return $builder
-            ->add('foo', 'text')
+        return $form
             ->add('enabled', 'checkbox')
+            ->add('foo', 'text')
             ;
     }
 

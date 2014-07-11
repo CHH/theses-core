@@ -39,7 +39,7 @@
                         </h1>
                     </header>
                     <section class="post-content post-excerpt">
-                        {{ post.content | striptags | truncate(300) }}
+                        {{ app.posts.render(post) | striptags | truncate(300) }}
                     </section>
                     <footer>
                         <div class="post-meta">

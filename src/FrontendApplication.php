@@ -16,6 +16,8 @@ class FrontendApplication extends \Silex\Application
     {
         parent::__construct();
 
+        $this['debug'] = true;
+
         $this->register(new Provider\MonologServiceProvider, [
             'monolog.logfile' => $this->share(function() {
                 return $this['theses']['data_dir'] . '/app.log';
@@ -36,6 +38,9 @@ class FrontendApplication extends \Silex\Application
 
         $this['twig'] = $this->share($this->extend('twig', function($twig) {
             $twig->addGlobal('site', $this['site']);
+            $twig->addExtension(new twig\PostExtension(
+                $this['theses']['posts']
+            ));
             return $twig;
         }));
 
