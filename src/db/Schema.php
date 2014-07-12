@@ -27,6 +27,7 @@ class Schema extends BaseSchema
         $users->addColumn('display_name', 'string');
         $users->addColumn('email', 'string');
         $users->addColumn('role', 'string', ['notnull' => true]);
+        $users->addColumn('nickname', 'string');
 
         $users->setPrimaryKey(['id']);
         $users->addUniqueIndex(["username"]);

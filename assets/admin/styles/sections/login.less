@@ -3,6 +3,7 @@
 
     h1 {
         color: contrast(@color-primary);
+        color: fade(black, 50%);
         font-weight: 100;
         font-size: 4em;
     }
@@ -37,11 +38,13 @@
 
         .login-inputs {
             border-radius: 5px;
+            background: white;
             border: 1px solid contrast(@color-primary);
+            border: 1px solid fade(black, 50%);
             label[for=username], label[for=password] { display: none; }
 
             > div {
-                border-bottom: 1px solid contrast(@color-primary);
+                border-bottom: 1px solid fade(black, 50%);
                 margin: 0;
 
                 &:last-child {
@@ -56,7 +59,6 @@
             border: none;
             background: transparent;
             padding: 0.5em;
-            color: contrast(@bg-color);
 
             &:focus {
                 border: none;
@@ -74,6 +76,16 @@
 
         .btn {
             .btn-inverted;
+            background: fade(black, 20%);
+            border: none;
+            border-radius: 5px;
+            padding: 0.5em;
+            font-size: 1em;
+
+            &:hover {
+                outline: none;
+                background: fade(black, 15%);
+            }
         }
     }
 }

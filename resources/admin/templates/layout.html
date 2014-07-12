@@ -14,34 +14,7 @@
         <div id="site">
             <header id="main-head">
                 <nav id="main-nav">
-                    <ul>
-                        <li class="menu-entry user {{ app.request.attributes.get('_route') == 'dashboard' ? 'active' : '' }}">
-                            <a href="{{ path('dashboard') }}">
-                                <img class="user-avatar" src="{{ gravatar(app.user.email, {size: 128}) }}">
-                                <span class="menu-label">{{ app.user.displayName|split(' ')|first }}</span>
-                            </a>
-                        </li>
-                    {% for entry in app.menu %}
-                        {% if entry.route is defined and entry.route != "" %}
-                            {% set href = path(entry.route) %}
-                        {% elseif entry.url is defined %}
-                            {% set href = entry.url %}
-                        {% endif %}
-                        <li class="menu-entry {{ entry.route is defined and app.request.attributes.get('_route') == entry.route ? 'active' : '' }}">
-                            <a href="{{ href }}">
-                                <i class="menu-icon fa fa-{{ entry.icon }}"></i>
-                                <span class="menu-label">{{ entry.label }}</span>
-                            </a>
-                        </li>
-                    {% endfor %}
-
-                        <li class="menu-entry">
-                            <a href="/admin/logout">
-                                <i class="menu-icon fa fa-power-off"></i>
-                                <span class="menu-label">Logout</span>
-                            </a>
-                        </li>
-                    </ul>
+                    {{ knp_menu_render('main', {template: 'menu/main_menu.html.twig'}, 'twig') }}
                 </nav>
             </header>
 

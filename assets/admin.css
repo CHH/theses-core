@@ -355,6 +355,16 @@ td,
 th {
   padding: 0;
 }
+@media (min-width: 30em) {
+  .row {
+    width: 100%;
+    display: table;
+    table-layout: fixed;
+  }
+  .col {
+    display: table-cell;
+  }
+}
 body {
   font-family: "Open Sans", sans-serif;
 }
@@ -421,16 +431,16 @@ a.delete {
   width: 3em;
   border-radius: 9999px;
 }
-#main-nav .menu-entry {
+#main-nav li {
   text-align: center;
 }
-#main-nav .menu-entry.active a {
+#main-nav li.current a {
   color: #25c421;
 }
-#main-nav .menu-entry.active a:hover {
+#main-nav li.current a:hover {
   color: #29da25;
 }
-#main-nav .menu-entry a {
+#main-nav li a {
   display: block;
   padding: 0.8em 1.2em;
   -webkit-transition: 0.2s color;
@@ -439,16 +449,16 @@ a.delete {
   text-decoration: none;
   border: none;
 }
-#main-nav .menu-entry a:hover {
+#main-nav li a:hover {
   color: rgba(255, 255, 255, 0.8);
   -webkit-transition: 0.2s color;
   transition: 0.2s color;
 }
-#main-nav .menu-entry .menu-icon {
+#main-nav li .menu-icon {
   font-size: 2em;
   display: block;
 }
-#main-nav .menu-entry .menu-label {
+#main-nav li .menu-label {
   margin: 0.5em 0 0;
   display: block;
   font-size: 0.7em;
@@ -462,33 +472,45 @@ a.delete {
   min-width: 200px;
   padding-top: 2.33em;
 }
-.secondary-nav > nav h1 {
+.secondary-nav > nav a,
+.secondary-nav > nav span {
+  display: block;
+  padding: 0.5em 1em;
+  border: none;
+}
+.secondary-nav > nav span {
+  color: rgba(255, 255, 255, 0.4);
+}
+.secondary-nav > nav a {
+  color: rgba(255, 255, 255, 0.8);
+}
+.secondary-nav > nav > ul > li > span,
+.secondary-nav > nav > ul > li > a {
+  display: block;
   margin: 0 0 0.5em;
   font-size: 1em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   font-weight: 300;
   color: rgba(255, 255, 255, 0.5);
 }
-.secondary-nav > nav h1,
-.secondary-nav > nav a {
-  padding: 0.5em 1em;
-}
-.secondary-nav > nav a {
-  color: rgba(255, 255, 255, 0.8);
+.secondary-nav > nav > ul > li > span:hover,
+.secondary-nav > nav > ul > li > a:hover {
+  background: transparent !important;
 }
 .secondary-nav > nav ul {
   list-style: none;
   padding: 0;
   margin: 0 0 1em;
 }
-.secondary-nav > nav ul a {
+.secondary-nav > nav ul li > a,
+.secondary-nav > nav ul li > span {
   display: block;
-  border: none;
 }
-.secondary-nav > nav ul a:hover {
+.secondary-nav > nav ul li > a:hover,
+.secondary-nav > nav ul li > span:hover {
   background: rgba(0, 0, 0, 0.1);
 }
-.secondary-nav > nav ul li.active a {
+.secondary-nav > nav ul li.current a {
   background: rgba(0, 0, 0, 0.2);
   background: rgba(37, 196, 33, 0.8);
 }
@@ -528,7 +550,6 @@ a.delete {
   font-weight: bold;
 }
 .btn {
-  border: 2px solid rgba(0, 0, 0, 0.1);
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -537,35 +558,37 @@ a.delete {
   -webkit-transform: scale(1);
   -ms-transform: scale(1);
   transform: scale(1);
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  border: none;
+  -webkit-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .btn.btn-delete {
   color: #e9282a;
 }
 .btn:active {
-  -webkit-transition: 0.5s;
-  transition: 0.5s;
-  -webkit-transform: scale(0.98);
-  -ms-transform: scale(0.98);
-  transform: scale(0.98);
-}
-.btn:hover {
-  border-color: rgba(0, 0, 0, 0.2);
-  border-width: 2px;
+  -webkit-transition: 0.1s;
+  transition: 0.1s;
+  -webkit-transform: scale(0.95);
+  -ms-transform: scale(0.95);
+  transform: scale(0.95);
 }
 .btn.btn-primary {
   background: #25c421;
   color: #ffffff;
-  border: 2px solid #25c421;
 }
 .btn.btn-primary:hover {
-  -webkit-transition: 0.2s all;
-  transition: 0.2s all;
-  outline: 2px solid #156d12;
+  background: #21ae1d;
 }
 .btn.btn-primary.btn-delete {
-  border-color: #e92729;
   background: #e92729;
   color: #ffffff;
+}
+.btn-large {
+  font-size: 1em;
+  padding: 0.5em;
 }
 .btn-stretched {
   width: 100%;
@@ -580,6 +603,17 @@ a.delete {
 }
 .btn-inverted:active {
   background: rgba(255, 255, 255, 0.6);
+}
+.btn-dark {
+  border: none;
+  background: rgba(0, 0, 0, 0.2);
+}
+.btn-dark:hover {
+  outline: none;
+  background: rgba(0, 0, 0, 0.25);
+}
+.btn-dark:active {
+  background: rgba(0, 0, 0, 0.3);
 }
 .btn-inverted.btn-primary {
   font-weight: 600;
@@ -723,8 +757,8 @@ table th {
   -webkit-align-self: center;
   -ms-flex-item-align: center;
   align-self: center;
-  padding: 0 1em;
-  font-size: 2em;
+  padding: 0 0.5em;
+  font-size: 3em;
   color: rgba(0, 0, 0, 0.6);
 }
 .block-notification > .message {
@@ -735,7 +769,11 @@ table th {
   font-weight: bold;
 }
 .block-notification.notice {
-  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  border: 1px solid rgba(33, 102, 195, 0.6);
+}
+.block-notification.notice > .fa {
+  color: #2166c3;
 }
 #stream {
   max-width: 45em;
@@ -845,14 +883,15 @@ table th {
   margin: 0 1em 0 0;
 }
 .pane .pane-title .btn {
-  border: 2px solid #ffffff;
-  color: #ffffff;
+  border: none;
+  background: rgba(0, 0, 0, 0.2);
 }
 .pane .pane-title .btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  background: rgba(0, 0, 0, 0.25);
 }
 .pane .pane-title .btn:active {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.3);
 }
 .pane .pane-title .btn-primary {
   font-weight: 600;
@@ -1141,6 +1180,7 @@ table th {
 }
 .login h1 {
   color: #ffffff;
+  color: rgba(0, 0, 0, 0.5);
   font-weight: 100;
   font-size: 4em;
 }
@@ -1169,14 +1209,16 @@ table th {
 }
 .login form .login-inputs {
   border-radius: 5px;
+  background: white;
   border: 1px solid #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.5);
 }
 .login form .login-inputs label[for=username],
 .login form .login-inputs label[for=password] {
   display: none;
 }
 .login form .login-inputs > div {
-  border-bottom: 1px solid #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
   margin: 0;
 }
 .login form .login-inputs > div:last-child {
@@ -1189,7 +1231,6 @@ table th {
   border: none;
   background: transparent;
   padding: 0.5em;
-  color: #ffffff;
 }
 .login form input:focus {
   border: none;
@@ -1219,10 +1260,19 @@ table th {
 .login form .btn {
   border: 2px solid #ffffff;
   color: #ffffff;
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  border-radius: 5px;
+  padding: 0.5em;
+  font-size: 1em;
 }
 .login form .btn:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 .login form .btn:active {
   background: rgba(255, 255, 255, 0.6);
+}
+.login form .btn:hover {
+  outline: none;
+  background: rgba(0, 0, 0, 0.15);
 }

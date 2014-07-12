@@ -2,20 +2,6 @@
 
 {% block secondary_nav %}
 <nav>
-    {% for section in app['menu.settings'] %}
-    <h1>{{ section.label }}</h1>
-    <ul>
-        {% for item in section.items %}
-            {% if item.route is defined and item.route is not empty %}
-                {% set href = path(item.route) %}
-            {% else %}
-                {% set href = item.url %}
-            {% endif %}
-        <li class="{{ item.route is defined and app.request.attributes.get('_route') == item.route ? 'active' : '' }}">
-            <a href="{{ href }}">{{ item.label }}</a>
-        </li>
-        {% endfor %}
-    </ul>
-    {% endfor %}
+    {{ knp_menu_render('settings') }}
 </nav>
 {% endblock %}

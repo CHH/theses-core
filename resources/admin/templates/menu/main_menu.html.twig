@@ -1,0 +1,20 @@
+{% extends 'knp_menu.html.twig' %}
+
+{% block label %}{% spaceless %}
+    {% if item.extras.user is defined %}
+    {% set user = item.extras.user %}
+    <img src="{{ gravatar(user.email, {size: 128}) }}" alt="" class="user-avatar">
+    {% endif %}
+
+    {% if item.extras.icon is defined %}
+    <i class="menu-icon fa fa-{{ item.extras.icon }}"></i>
+    {% endif %}
+
+    <span class="menu-label">
+    {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
+    {{ item.label|raw }}
+    {% else %}
+    {{ item.label }}
+    {% endif %}
+    </span>
+{% endspaceless %}{% endblock %}

@@ -6,8 +6,8 @@
 
     > .fa {
         align-self: center;
-        padding: 0 1em;
-        font-size: 2em;
+        padding: 0 0.5em;
+        font-size: 3em;
         color: fade(black, 60%);
     }
 
@@ -17,6 +17,8 @@
     }
 
     &.notice {
-        background: fade(black, 10%);
+        > .fa { color: @color-notification-notice; }
+        border-radius: 3px;
+        border: 1px solid fade(@color-notification-notice, 60%);
     }
 }

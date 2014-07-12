@@ -64,10 +64,9 @@ class Theses extends \Pimple
 
     function addAdminMenuEntry($label, array $options = [])
     {
-        $entry = array_merge(
-            ['label' => $label, 'icon' => ''],
-            $options
-        );
+        if (isset($options['icon'])) {
+            $options['extras']['icon'] = $options['icon'];
+        }
 
         $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($entry) {
             $menu = $admin['menu'];
@@ -80,15 +79,27 @@ class Theses extends \Pimple
         return $this;
     }
 
-    function addSettingsMenuEntry($label, array $options = [])
+    function addSettingsMenuEntry($name, array $options = [])
     {
-        $entry = array_merge(['label' => $label, 'section' => 'plugins'], $options);
+        $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($name, $options) {
+            $admin['menu.settings'] = $admin->share($admin->extend('menu.settings', function($menu) use ($name, $options)  {
+                $menu['Core']->addChild($name, $options);
+                return $menu;
+            }));
 
-        $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($entry) {
-            $menu = $admin['menu.settings'];
-            $menu[$entry['section']]['items'][] = $entry;
+            return $admin;
+        }));
 
-            $admin['menu.settings'] = $menu;
+        return $this;
+    }
+
+    function addPluginSettingsMenuEntry($name, array $options = [])
+    {
+        $this['admin.engine'] = $this->share($this->extend('admin.engine', function($admin) use ($name, $options) {
+            $admin['menu.settings'] = $admin->share($admin->extend('menu.settings', function($menu) use ($name, $options)  {
+                $menu['Plugins']->addChild($name, $options);
+                return $menu;
+            }));
 
             return $admin;
         }));
@@ -245,12 +256,14 @@ class Theses extends \Pimple
         $pluginSlug = (new \Cocur\Slugify\Slugify)->slugify($info['name']);
         $pluginRoute = 'plugin_' . $pluginSlug;
 
-        $menu = $admin['menu.settings'];
-        $menu['plugins']['items'][] = [
-            'label' => $info['name'],
-            'route' => $pluginRoute,
-        ];
-        $admin['menu.settings'] = $menu;
+        $admin['menu.settings'] = $admin->share($admin->extend('menu.settings', function($menu) use ($info, $pluginRoute) {
+            $menu['Plugins']->addChild($info['name'], [
+                'label' => $info['name'],
+                'route' => $pluginRoute,
+            ]);
+
+            return $menu;
+        }));
 
         $admin->match(
             "/settings/$pluginSlug",

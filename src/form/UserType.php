@@ -14,6 +14,7 @@ class UserType extends AbstractType
             ->add('username', 'text', ['constraints' => new Assert\NotBlank])
             ->add('password', 'password')
             ->add('display_name', 'text')
+            ->add('nickname', 'text', ['label' => 'What do you want to be called personally?'])
             ->add('email', 'email', ['constraints' => new Assert\Email])
             ->add('role', 'choice', [
                 'choices' => [
