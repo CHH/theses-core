@@ -14,6 +14,7 @@ class AdminApplication extends \Silex\Application
     use \Silex\Application\TranslationTrait;
     use \Silex\Application\FormTrait;
     use \Silex\Application\SecurityTrait;
+    use ContainerUtilitiesTrait;
 
     function __construct(array $values = [])
     {
@@ -22,44 +23,6 @@ class AdminApplication extends \Silex\Application
         $app = $this;
 
         $app['debug'] = true;
-
-        $app['menu'] = [
-            [
-                'route' => 'posts',
-                'label' => 'Posts',
-                'icon' => 'list'
-            ],
-            [
-                'route' => 'settings',
-                'label' => 'Settings',
-                'icon' => 'cogs'
-            ],
-        ];
-
-        $app['menu.settings'] = [
-            'core' => [
-                'label' => 'Core',
-                'items' => [
-                    [
-                        'label' => 'General',
-                        'route' => 'settings'
-                    ],
-                    [
-                        'label' => 'Media',
-                        'url' => ''
-                    ],
-                    [
-                        'label' => 'Users',
-                        'route' => 'users'
-                    ]
-                ]
-            ],
-            // Section for plugin settings panels
-            'plugins' => [
-                'label' => 'Plugins',
-                'items' => []
-            ]
-        ];
 
         $app['menu.main'] = $app->share(function() use ($app) {
             $menu = $app['knp_menu.factory']->createItem('Root');

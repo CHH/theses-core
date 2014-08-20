@@ -10,20 +10,15 @@ class UpgradeManager
     function upgradeDatabaseSchema(Connection $connection)
     {
         $currentSchema = $connection->getSchemaManager()->createSchema();
-        $upgradedSchema = clone $currentSchema;
-
-        try {
-            $thesesSchema = new db\Schema([], $connection);
-            $thesesSchema->addToSchema($upgradedSchema);
-        } catch (SchemaException $e) {}
+        $thesesSchema = new db\Schema([], $connection);
 
         // Try adding the Jackalope Schema
         try {
             $jackalopeSchema = new \Jackalope\Transport\DoctrineDBAL\RepositorySchema([], $connection);
-            $jackalopeSchema->addtoSchema($upgradedSchema);
+            $jackalopeSchema->addtoSchema($thesesSchema);
         } catch (SchemaException $e) {}
 
-        $migrations = $currentSchema->getMigrateToSql($upgradedSchema, $connection->getDatabasePlatform());
+        $migrations = $currentSchema->getMigrateToSql($thesesSchema, $connection->getDatabasePlatform());
 
         foreach ($migrations as $query) {
             $connection->exec($query);

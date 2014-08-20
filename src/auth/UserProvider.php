@@ -30,6 +30,7 @@ class UserProvider implements UserProviderInterface
         $userObject->id = $user['id'];
         $userObject->email = $user['email'];
         $userObject->displayName = $user['display_name'];
+        $userObject->nickname = $user['nickname'];
 
         return $userObject;
     }

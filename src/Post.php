@@ -42,7 +42,7 @@ class Post
     function modify(array $attributes)
     {
         foreach ($attributes as $attribute => $value) {
-            if (property_exists(get_called_class(), $attribute)) {
+            if (property_exists($this, $attribute)) {
                 $this->$attribute = $value;
             }
         }

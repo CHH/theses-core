@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class FrontendApplication extends \Silex\Application
 {
     use \Silex\Application\UrlGeneratorTrait;
+    use ContainerUtilitiesTrait;
 
     function __construct(array $values = [])
     {
