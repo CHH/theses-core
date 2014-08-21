@@ -26,6 +26,7 @@ class AdminApplication extends \Silex\Application
 
         $app['menu.main'] = $app->share(function() use ($app) {
             $menu = $app['knp_menu.factory']->createItem('Root');
+            $request = $app['request_stack']->getCurrentRequest();
 
             if ($token = $app['security']->getToken()) {
                 $user = $token->getUser();
@@ -45,6 +46,12 @@ class AdminApplication extends \Silex\Application
                 'extras' => ['icon' => 'list'],
             ]);
 
+            $menu->addChild('Pages', [
+                'label' => 'Pages',
+                'uri' => '/admin/pages',
+                'extras' => ['icon' => 'files-o']
+            ]);
+
             $menu->addChild('Settings', [
                 'label' => 'Settings',
                 'route' => 'settings',
@@ -53,7 +60,7 @@ class AdminApplication extends \Silex\Application
 
             $menu->addChild('Logout', [
                 'label' => "Logout",
-                'uri' => '/admin/logout',
+                'uri' => $request->getBaseUrl().'/logout',
                 'extras' => ['icon' => 'power-off'],
             ]);
 
