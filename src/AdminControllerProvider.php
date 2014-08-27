@@ -15,6 +15,13 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
     {
         $routes = $app['controllers_factory'];
 
+        $app->get('/login', function (Request $request) use ($app) {
+            return $app['twig']->render('login.html', [
+                'error'         => $app['security.last_error']($request),
+                'last_username' => $app['session']->get('_security.last_username'),
+            ]);
+        })->bind('admin_login');
+
         $routes->get('/', function() use ($app) {
             $stream = [
                 [

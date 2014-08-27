@@ -1,12 +1,16 @@
 {% extends "layout.html" %}
 
+{% block title %}
+Posts
+{% endblock %}
+
 {% block content %}
 <div class="pane">
     <div class="pane-title">
         <h1>Posts</h1>
 
         <div class="pane-actions toolbar toolbar-light">
-            <a href="{{path('posts_create')}}" class="toolbar-btn btn btn-primary btn-inverted">
+            <a target=_blank href="{{path('posts_create')}}" class="toolbar-btn btn btn-primary btn-inverted">
                 Create Post
             </a>
         </div>
@@ -33,7 +37,7 @@
                 <article class="post-preview {{ post.publishedAt ? 'published' : '' }}">
                     <header class="post-title">
                         <h1>
-                            <a href="{{ path('posts_edit', {slug: post.slug}) }}">
+                            <a target=_blank href="{{ path('posts_edit', {slug: post.slug}) }}">
                                 {{ post.title }}
                             </a>
                         </h1>
@@ -53,7 +57,7 @@
                         </div>
 
                         <span class="post-actions">
-                            <a href="{{ path('posts_edit', {slug: post.slug}) }}">Edit</a>
+                            <a target=_blank href="{{ path('posts_edit', {slug: post.slug}) }}">Edit</a>
                             <a class="delete" href="{{ path('posts_delete', {id: post.id}) }}">Delete</a>
                         </span>
                     </footer>

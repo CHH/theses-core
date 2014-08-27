@@ -163,13 +163,6 @@ class AdminApplication extends \Silex\Application
         $app->mount('/', new \theses\AdminControllerProvider);
         $app->mount('/', new \theses\admin\controllers\PostsController);
 
-        $app->get('/login', function (Request $request) use ($app) {
-            return $app['twig']->render('login.html', [
-                'error'         => $app['security.last_error']($request),
-                'last_username' => $app['session']->get('_security.last_username'),
-            ]);
-        })->bind('admin_login');
-
         foreach ($values as $key => $value) {
             $this[$key] = $value;
         }

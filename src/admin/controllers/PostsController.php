@@ -16,6 +16,8 @@ class PostsController implements ControllerProviderInterface
         $routes->get('/posts', static::class.'::indexAction')->bind('posts');
         $routes->match('/posts/new', static::class.'::newAction')->bind('posts_create');
         $routes->match('/posts/{slug}/edit', static::class.'::editAction')->bind('posts_edit');
+
+        // TODO: Only match DELETE method (or _method=DELETE)
         $routes->get('/posts/{id}/delete', static::class.'::deleteAction')->bind('posts_delete');
 
         return $routes;
