@@ -16,6 +16,8 @@ class UserType extends AbstractType
             ->add('display_name', 'text')
             ->add('nickname', 'text', ['label' => 'What do you want to be called personally?'])
             ->add('email', 'email', ['constraints' => new Assert\Email])
+            ->add('bio', 'textarea')
+            ->add('enabled', 'checkbox')
             ->add('role', 'choice', [
                 'choices' => [
                     'ROLE_EDITOR' => 'Editor',

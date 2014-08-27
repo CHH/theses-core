@@ -41,13 +41,13 @@ class PostRepository implements \IteratorAggregate
 
     function findBySlug($slug)
     {
-        $node = $this->session->getNode("/posts/$slug");
+        $node = $this->session->getNode("/theses/posts/$slug");
         return $this->createFromNode($node);
     }
 
     function findByPermalink($permalink)
     {
-        $route = $this->session->getNode("/routes/$permalink");
+        $route = $this->session->getNode("/theses/routes/$permalink");
         $node = $route->getProperty('node')->getNode();
 
         return $this->createFromNode($node);
@@ -55,7 +55,7 @@ class PostRepository implements \IteratorAggregate
 
     function findAll()
     {
-        $posts = NodeHelper::createPath($this->session, '/posts');
+        $posts = NodeHelper::createPath($this->session, '/theses/posts');
 
         return iter\map(function($node) {
             return $this->createFromNode($node);
@@ -66,7 +66,7 @@ class PostRepository implements \IteratorAggregate
     {
         $workspace = $this->session->getWorkspace();
         $queryManager = $workspace->getQueryManager();
-        $sql = 'SELECT * FROM [nt:unstructured] AS post WHERE (ISDESCENDANTNODE(post, [/posts]) AND post.[publishedAt] IS NOT NULL) ORDER BY publishedAt DESC';
+        $sql = 'SELECT * FROM [nt:unstructured] AS post WHERE (ISDESCENDANTNODE(post, [/theses/posts]) AND post.[publishedAt] IS NOT NULL) ORDER BY publishedAt DESC';
         $query = $queryManager->createQuery($sql, 'JCR-SQL2');
 
         foreach ($query->execute() as $path => $row) {
@@ -104,7 +104,7 @@ class PostRepository implements \IteratorAggregate
     {
         $this->dispatcher->dispatch(Events::POST_BEFORE_INSERT, new event\PostEvent($post));
 
-        $posts = NodeHelper::createPath($this->session, '/posts');
+        $posts = NodeHelper::createPath($this->session, '/theses/posts');
 
         $post->modify([
             'slug' => (new \Cocur\Slugify\Slugify)->slugify($post->getTitle())
@@ -199,7 +199,7 @@ class PostRepository implements \IteratorAggregate
     {
         $permalink = ltrim($post->getUrl(), '/');
 
-        $route = NodeHelper::createPath($this->session, "/routes/$permalink");
+        $route = NodeHelper::createPath($this->session, "/theses/routes/$permalink");
         $route->setProperty('node', $post->getId(), PropertyType::WEAKREFERENCE);
 
         $this->session->save();

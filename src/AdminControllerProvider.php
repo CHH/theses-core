@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use PHPCR\Util\NodeHelper;
 use iter;
 use Symfony\Component\Validator\Constraints as Assert;
+use theses\User;
 
 class AdminControllerProvider implements \Silex\ControllerProviderInterface
 {
@@ -40,111 +41,6 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
             return $app['twig']->render("index.html", compact('stream'));
         })->bind('dashboard');
 
-        $routes->get('/posts', function() use ($app) {
-            $posts = $app['posts']->findAll();
-
-            return $app['twig']->render('posts/index.html', [
-                'posts' => $posts
-            ]);
-        })->bind('posts');
-
-        $routes->match('/posts/new', function(Request $req) use ($app) {
-            $post = $app['posts']->create();
-
-            if ($req->isMethod("POST")) {
-                $data = $req->get('post');
-
-                $post->modify([
-                    'title' => $data['title'],
-                    'content' => $data['content'],
-                ]);
-
-                if (isset($data['custom'])) {
-                    $custom = [];
-                    foreach ($data['custom'] as $prop) {
-                        if (!empty($prop['property'])) {
-                            $custom[ $prop['property'] ] = $prop['value'];
-                        }
-                    }
-
-                    $post->modify([
-                        'userProperties' => $custom
-                    ]);
-                }
-
-                if (empty($data['title'])) {
-                    $app['session']->getFlashBag()->add('error', 'Post title cannot be empty');
-                    goto render;
-                }
-
-                $app['posts']->insert($post);
-
-                return $app->redirect($app->path('posts_edit', ['slug' => $post->getSlug()]));
-            }
-
-        render:
-            return $app['twig']->render('posts/create.html', ['post' => $post]);
-        })->bind('posts_create');
-
-        $routes->match('/posts/{slug}/edit', function(Request $req, $slug) use ($app) {
-            $post = $app['posts']->findBySlug($slug);;
-
-            if ($req->isMethod('POST')) {
-                $data = $req->get('post');
-                $attributes = [];
-
-                if ($req->get('publish') !== null) {
-                    $post->publish();
-                }
-
-                if ($req->get('unpublish') !== null) {
-                    $post->unpublish();
-                }
-
-                if (isset($data['custom'])) {
-                    $custom = [];
-                    foreach ($data['custom'] as $prop) {
-                        if (!empty($prop['property'])) {
-                            $custom[ $prop['property'] ] = $prop['value'];
-                        }
-                    }
-
-                    $attributes['userProperties'] = $custom;
-                }
-
-                if (empty($data['title'])) {
-                    $app['session']->getFlashBag()->add('error', 'Post title cannot be empty');
-                    goto redirect;
-                }
-
-                $attributes['title'] = $data['title'];
-                $attributes['content'] = $data['content'];
-                $attributes['slug'] = (new \Cocur\Slugify\Slugify)->slugify($attributes['title']);
-
-                $post->modify($attributes);
-
-                $app['posts']->update($post);
-
-            redirect:
-                return $app->redirect($app->path('posts_edit', ['slug' => $post->getSlug()]));
-            }
-
-            return $app['twig']->render('posts/edit.html', [
-                'post' => $post
-            ]);
-        })->bind('posts_edit');
-
-        $routes->get('/posts/{id}/delete', function($id) use ($app) {
-            $session = $app['theses']['phpcr.session'];
-
-            $post = $session->getNodeByIdentifier($id);
-            $post->remove();
-
-            $session->save();
-
-            return $app->redirect($app->path('posts'));
-        })->bind('posts_delete');
-
         $routes->get('/settings', function() use ($app) {
             $options = $app['theses']['system_settings']->all();
 
@@ -173,12 +69,15 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
         })->bind('users');
 
         $routes->match('/settings/users/create', function(Request $request) use ($app) {
-            $form = $app['form.factory']->createBuilder(new form\UserType)->getForm();
+            $defaults = ['enabled' => true];
+            $form = $app['form.factory']->createBuilder(new form\UserType, $defaults)->getForm();
             $form->handleRequest($request);
 
             if ($form->isValid()) {
                 $data = $form->getData();
-                $data['password'] = $app['security.encoder.digest']->encodePassword($data['password'], $app['user.salt']);
+                $user = User::fromAttributes($data);
+                $encoder = $app['security.encoder_factory']->getEncoder(get_class($user));
+                $data['password'] = $encoder->encodePassword($data['password'], $user->getSalt());
 
                 $app['theses']['db']->insert('users', $data);
                 return $app->redirect($app->path('users'));
@@ -198,8 +97,12 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
                 if (empty($data['password'])) {
                     unset($data['password']);
                 } else {
-                    $data['password'] = $app['security.encoder.digest']->encodePassword($data['password'], $app['user.salt']);
+                    $user = User::fromAttributes($data);
+                    $encoder = $app['security.encoder_factory']->getEncoder(get_class($user));
+                    $data['password'] = $encoder->encodePassword($data['password'], $user->getSalt());
                 }
+
+                $data['enabled'] = $data['enabled'] ? 'true' : 'false';
 
                 $app['theses']['db']->update('users', $data, ['id' => $id]);
                 return $app->redirect($app->path('user_edit', ['id' => $id]));
@@ -214,8 +117,8 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
         })->bind('user_delete');
 
         $routes->get('/updater/upgrade', function() use ($app) {
-            $upgradeManger = new UpgradeManager;
-            $migrations = $upgradeManger->upgradeDatabaseSchema($app['theses']['db']);
+            $upgradeManager = new UpgradeManager;
+            $migrations = $upgradeManager->upgradeDatabaseSchema($app['theses']['db']);
 
             return $app->json(['success' => true, 'migrations' => $migrations]);
         });

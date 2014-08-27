@@ -183,10 +183,12 @@ class Theses extends \Pimple
             return new Post($attributes, $this['dispatcher'], $this['post.url_generator']);
         });
 
-        $app['system_settings.defaults'] = [
-            'siteUrl' => 'http://localhost',
-            'permalinkStrategy' => PostRepository::PERMALINK_DATE_TITLE,
-        ];
+        $app['system_settings.defaults'] = function () {
+            return [
+                'siteUrl' => isset($app['site_url']) ? $app['site_url'] : 'http://localhost',
+                'permalinkStrategy' => PostRepository::PERMALINK_DATE_TITLE,
+            ];
+        };
 
         $app['system_settings'] = $app->share(function () {
             return $this['settings_factory']('system', $this['system_settings.defaults']);

@@ -3,11 +3,10 @@
 namespace theses;
 
 use Symfony\Component\HttpFoundation\Request;
-use Knp\Menu\Matcher\Voter;
+use Knp\Menu\Matcher\Voter as MenuVoter;
+use Symfony\Component\Security\Core\Encoder\EncoderFactory;
+use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
-/**
- * TODO: Use KnpMenu for menus
- */
 class AdminApplication extends \Silex\Application
 {
     use \Silex\Application\UrlGeneratorTrait;
@@ -24,14 +23,14 @@ class AdminApplication extends \Silex\Application
 
         $app['debug'] = true;
 
-        $app['menu.main'] = $app->share(function() use ($app) {
+        $app['menu.main'] = $app->share(function () use ($app) {
             $menu = $app['knp_menu.factory']->createItem('Root');
             $request = $app['request_stack']->getCurrentRequest();
 
             if ($token = $app['security']->getToken()) {
                 $user = $token->getUser();
                 $menu->addChild('CurrentUser', [
-                    'label' => isset($user->nickname) ? $user->nickname : $user->displayName,
+                    'label' => $user->getNickname() ?: $user->getDisplayName(),
                     'route' => 'dashboard',
                     'attributes' => ['class' => 'user'],
                     'extras' => [
@@ -49,7 +48,7 @@ class AdminApplication extends \Silex\Application
             $menu->addChild('Pages', [
                 'label' => 'Pages',
                 'uri' => '/admin/pages',
-                'extras' => ['icon' => 'files-o']
+                'extras' => ['icon' => 'file-text']
             ]);
 
             $menu->addChild('Settings', [
@@ -67,7 +66,7 @@ class AdminApplication extends \Silex\Application
             return $menu;
         });
 
-        $app['menu.settings'] = $app->share(function() use ($app) {
+        $app['menu.settings'] = $app->share(function () use ($app) {
             $menu = $app['knp_menu.factory']->createItem('Settings');
 
             $core = $menu->addChild('Core', [
@@ -100,12 +99,14 @@ class AdminApplication extends \Silex\Application
             'settings' => 'menu.settings',
         ];
 
-        $app['knp_menu.matcher.configure'] = $app->protect(function($matcher) use ($app) {
-            $routeVoter = new Voter\RouteVoter;
-            $routeVoter->setRequest($app['request']);
+        $app['knp_menu.matcher.configure'] = $app->protect(function ($matcher) use ($app) {
+            $request = $app['request_stack']->getCurrentRequest();
+
+            $routeVoter = new MenuVoter\RouteVoter;
+            $routeVoter->setRequest($request);
 
             $matcher->addVoter($routeVoter);
-            $matcher->addVoter(new Voter\UriVoter($app['request']->getRequestUri()));
+            $matcher->addVoter(new MenuVoter\UriVoter($request->getRequestUri()));
         });
 
         $app->register(new \Silex\Provider\UrlGeneratorServiceProvider);
@@ -113,29 +114,29 @@ class AdminApplication extends \Silex\Application
             'monolog.name' => 'theses.admin',
         ]);
 
-        $app['monolog.logfile'] = function() use ($app) {
-            return $app['theses']['data_dir'] . '/app.log';
+        $app['monolog.logfile'] = function () use ($app) {
+            return $app['theses']['data_dir'].'/app.log';
         };
 
         $app->register(new \Silex\Provider\TwigServiceProvider, [
-            'twig.path' => __DIR__ . '/../resources/admin/templates'
+            'twig.path' => __DIR__.'/../resources/admin/templates'
         ]);
 
-        $app->register(new \Silex\Provider\SecurityServiceProvider);
-
-        $app['security.firewalls'] = array(
-            'login' => array(
+        $app['security.firewalls'] = [
+            'login' => [
                 'pattern' => '^/login$',
-            ),
-            'admin' => array(
+            ],
+            'admin' => [
                 'pattern' => '^/',
-                'form' => array('login_path' => '/login', 'check_path' => '/login_check'),
-                'users' => function() use ($app) {
+                'form' => ['login_path' => '/login', 'check_path' => '/login_check'],
+                'users' => function () use ($app) {
                     return new auth\UserProvider($app['theses']['db']);
                 },
-                    'logout' => ['logout_path' => '/logout']
-                ),
-            );
+                'logout' => ['logout_path' => '/logout']
+            ],
+        ];
+
+        $app->register(new \Silex\Provider\SecurityServiceProvider);
 
         $app['twig'] = $app->share($app->extend('twig', function(\Twig_Environment $twig) {
             $twig->addExtension(new \Twig_Extensions_Extension_Text());
@@ -145,8 +146,6 @@ class AdminApplication extends \Silex\Application
         $app['posts'] = $app->share(function() use ($app) {
             return $app['theses']['posts'];
         });
-
-        $app['user.salt'] = $_SERVER['SALT'];
 
         $app->register(new \Silex\Provider\SessionServiceProvider);
         $app->register(new \Silex\Provider\FormServiceProvider);
@@ -162,12 +161,13 @@ class AdminApplication extends \Silex\Application
         $app->register(new \Knp\Menu\Integration\Silex\KnpMenuServiceProvider);
 
         $app->mount('/', new \theses\AdminControllerProvider);
+        $app->mount('/', new \theses\admin\controllers\PostsController);
 
-        $app->get('/login', function(Request $request) use ($app) {
-            return $app['twig']->render('login.html', array(
+        $app->get('/login', function (Request $request) use ($app) {
+            return $app['twig']->render('login.html', [
                 'error'         => $app['security.last_error']($request),
                 'last_username' => $app['session']->get('_security.last_username'),
-            ));
+            ]);
         })->bind('admin_login');
 
         foreach ($values as $key => $value) {

@@ -4,7 +4,8 @@ namespace theses\auth;
 
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\User;
+//use Symfony\Component\Security\Core\User\User;
+use theses\User;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Doctrine\DBAL\Connection;
@@ -20,17 +21,13 @@ class UserProvider implements UserProviderInterface
 
     public function loadUserByUsername($username)
     {
-        $stmt = $this->conn->executeQuery('SELECT * FROM users WHERE username = ?', array(strtolower($username)));
+        $stmt = $this->conn->executeQuery('SELECT * FROM users WHERE username = ?', [strtolower($username)]);
 
         if (!$user = $stmt->fetch()) {
             throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
         }
 
-        $userObject = new User($user['username'], $user['password'], [$user['role']], true, true, true, true);
-        $userObject->id = $user['id'];
-        $userObject->email = $user['email'];
-        $userObject->displayName = $user['display_name'];
-        $userObject->nickname = $user['nickname'];
+        $userObject = User::fromAttributes($user);
 
         return $userObject;
     }

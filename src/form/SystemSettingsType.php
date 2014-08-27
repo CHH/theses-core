@@ -13,7 +13,6 @@ class SystemSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('siteUrl', 'text')
             ->add('permalinkStrategy', 'choice', [
                 'expanded' => true,
                 'choices' => [
