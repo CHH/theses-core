@@ -24,6 +24,20 @@
             })
         </script>
 
+        {% if post.id %}
+        <script type="text/javascript">
+            $(function() {
+                $("#published").change(function(e) {
+                    var form = $(e.currentTarget).prop('form');
+
+                    setTimeout(function() {
+                        form.submit();
+                    }, 200);
+                });
+            });
+        </script>
+        {% endif %}
+
         {% block body_end %}
         {% endblock %}
     </body>

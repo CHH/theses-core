@@ -44,6 +44,10 @@ class PostsController implements ControllerProviderInterface
                 'content' => $data['content'],
             ]);
 
+            if ($data['published'] === '1') {
+                $post->publish();
+            }
+
             if (isset($data['custom'])) {
                 $custom = [];
                 foreach ($data['custom'] as $prop) {
@@ -78,6 +82,12 @@ class PostsController implements ControllerProviderInterface
         if ($req->isMethod('POST')) {
             $data = $req->get('post');
             $attributes = [];
+
+            if ($data['published'] === '1') {
+                $post->publish();
+            } elseif ($data['published'] === '0') {
+                $post->unpublish();
+            }
 
             if ($req->get('publish') !== null) {
                 $post->publish();

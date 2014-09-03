@@ -139,7 +139,7 @@
         //background: white;
         border-left: 1px solid fade(black, 10%);
         width: 30%;
-        padding: 2em;
+        padding: 2em 0 0;
         opacity: 0.3;
         overflow-y: auto;
         transition: opacity 2s;
@@ -149,10 +149,24 @@
             opacity: 1;
         }
 
-        > h1 {
-            margin: 2em 0 0.5em;
-            font-size: 1em;
-        }
+    }
+
+    .editor-sidebar-section {
+        padding: 0 2em;
+    }
+
+    .editor-sidebar-heading {
+        padding: 0 2em;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin: 2em 0 0.5em;
+        font-size: 1em;
+        color: fade(black, 30%);
+        font-weight: 400;
+    }
+
+    .editor-sidebar-section + .editor-sidebar-section {
+        margin-top: 2em;
     }
 
     label[for="post-title"] {

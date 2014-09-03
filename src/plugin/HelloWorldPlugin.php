@@ -2,11 +2,14 @@
 
 namespace theses\plugin;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use theses\Events;
+
 /**
  * A simple demo plugin
  */
 class HelloWorldPlugin
-    implements Plugin, SettingsEnabled
+    implements Plugin, SettingsEnabled, EventSubscriberInterface
 {
     static function getPluginInfo()
     {
@@ -34,6 +37,17 @@ class HelloWorldPlugin
             ->add('enabled', 'checkbox')
             ->add('foo', 'text')
             ;
+    }
+
+    static function getSubscribedEvents()
+    {
+        return [
+            Events::POST_AFTER_SAVE => 'onSave'
+        ];
+    }
+
+    function onSave($event)
+    {
     }
 
     function register(\theses\Theses $core)

@@ -4,6 +4,7 @@ namespace theses;
 
 use Stack\Builder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class Theses extends \Pimple
@@ -128,6 +129,13 @@ class Theses extends \Pimple
                     return $loader;
                 });
                 return $admin;
+            });
+        }
+
+        if ($plugin instanceof EventSubscriberInterface) {
+            $this->extendShared('dispatcher', function($dispatcher) use ($plugin) {
+                $dispatcher->addSubscriber($plugin);
+                return $dispatcher;
             });
         }
 

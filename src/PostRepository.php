@@ -120,6 +120,10 @@ class PostRepository implements \IteratorAggregate
         $node->setProperty('title', $post->getTitle());
         $node->setProperty('content', $post->getContent());
 
+        if ($post->getPublishedAt()) {
+            $node->setProperty('publishedAt', $post->getPublishedAt());
+        }
+
         $this->session->save();
 
         $this->updateUserProperties($node, $post->getCustom());

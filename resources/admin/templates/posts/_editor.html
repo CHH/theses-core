@@ -3,23 +3,6 @@
 <script type="text/javascript" src="http://lab.lepture.com/editor/editor.js"></script>
 {% endblock %}
 
-{#
-<div class="editor-actions">
-    <a href="{{ path('posts') }}">&larr; Back to posts</a>
-    {% if post['jcr:lastModified'] is defined %}
-    <span class="meta">Last updated {{ post['jcr:lastModified'] | date('M d Y \\a\\t H:i') }}</span>
-    {% endif %}
-    <span class="spacer"></span>
-    <button name="save" type="submit" class="btn btn-primary">Save Post</button>
-
-    {% if post['publishedAt'] is defined and post['publishedAt'] is not empty %}
-    <button name="unpublish" type="submit" class="btn btn-primary">Unpublish</button>
-    {% else %}
-    <button name="publish" type="submit" class="btn btn-primary">Publish</button>
-    {% endif %}
-</div>
-#}
-
 <main class="editor-main">
     {% if app.session.flashBag.has('error') %}
     <div class="errors">
@@ -60,39 +43,52 @@
 </main>
 
 <aside class="editor-sidebar">
-    <p>
+    <div class="editor-sidebar-section">
         <a href="{{ path('posts') }}">&larr; Back to posts</a>
-    </p>
+    </div>
     {% if post.lastModified is defined %}
-    <p>
+    <div class="editor-sidebar-section">
         <span class="meta">Last updated {{ post.lastModified | date('M d Y \\a\\t H:i') }}</span>
-    </p>
+    </div>
     {% endif %}
-    {% if post.publishedAt is not empty %}
-    <p>
-        Published at {{ post.publishedAt|date('M d Y \\a\\t H:i') }}.
-    </p>
-    {% endif %}
-    <p class="toolbar stretch-childs">
-        <button name="save" type="submit" class="btn btn-primary">Save Post</button>
-    {% if post.publishedAt is not empty %}
-        <button name="unpublish" type="submit" class="btn btn-primary">Unpublish</button>
-    {% else %}
-        <button name="publish" type="submit" class="btn btn-primary">Publish</button>
-    {% endif %}
-    </p>
-    {% if post.publishedAt is not empty %}
-    <p>
+    <div class="editor-sidebar-section">
+        <div class="toolbar stretch-childs">
+            <button name="save" type="submit" class="btn btn-primary">Save Post</button>
+        </div>
+    </div>
+    <div class="editor-sidebar-section">
+        <div class="switch-row">
+            <div class="switch-row-label">
+                <label for="published">
+                    Published
+                </label>
+                <small>
+                    {% if post.publishedAt %}
+                    (since {{ post.publishedAt|date('M d Y') }})
+                    {% endif %}
+                </small>
+            </div>
+            <div class="switch-row-switch">
+                <input type="hidden" name="post[published]" value="0">
+                <fieldset id="published-switch" class="switch" tabindex=0>
+                    <input type="checkbox" id="published" name="post[published]" {{ post.publishedAt is not empty ? "checked" : "" }} value="1">
+                    <label for="published"></label>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="editor-sidebar-section">
+        {% if post.publishedAt is not empty %}
         <a href="{{ post.url }}" target="_blank">Permalink</a>
-    </p>
-    {% endif %}
-    {% if post.id is not empty %}
-    <p>
+        {% endif %}
+        {% if post.id is not empty %}
         <a href="{{ path('posts_delete', {id: post.id}) }}" class="delete">Delete this post</a>
-    </p>
-    {% endif %}
+        {% endif %}
+    </div>
 
-    <h1>Custom Properties</h1>
-    <p class="custom-properties">
-    </p>
+    <h1 class="editor-sidebar-heading">Custom Properties</h1>
+    <div class="editor-sidebar-section">
+        <div class="custom-properties">
+        </div>
+    </div>
 </aside>

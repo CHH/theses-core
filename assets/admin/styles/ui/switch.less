@@ -1,0 +1,92 @@
+.switch-row {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    border-bottom: 1px solid fade(black, 7%);
+}
+
+.switch-row-label {
+    //vertical-align: 0.5em;
+    vertical-align: middle;
+    width: 80%;
+    display: inline-block;
+    display: table-cell;
+    padding: 0.5em 0 0;
+}
+
+.switch-row + .switch-row .switch-row-label {
+}
+
+.switch-row-switch {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+    padding: 0.5em 0 0;
+}
+
+.switch {
+    position: relative;
+    border: none;
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 0;
+    font-size: 1.5em;
+    width: 2em;
+    height: 1em;
+    transform: translate3d(0,0,0);
+}
+
+.switch input[type=checkbox] {
+    width: 0px;
+    overflow: hidden;
+    opacity: 0;
+    margin: 0;
+}
+
+/* Extend the label, so the whole switch is clickable */
+.switch label {
+    cursor: pointer;
+    box-sizing: content-box;
+    transition: 150ms all;
+    position: absolute;
+    display: inline-block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0.1em;
+    background: #ccc;
+    border-radius: 9999px;
+}
+
+.switch input[type=checkbox]:checked + label {
+    background: @color-primary;
+}
+
+/* The "knob" */
+.switch label::after {
+    box-sizing: border-box;
+    transition: 150ms left;
+    content: "";
+    position: absolute;
+    height: 1em;
+    width: 1em;
+    left: 0.1em;
+    top: 0.1em;
+    background: white;
+    border-radius: 9999px;
+}
+
+/* Moves the "knob" to the right when the checkbox got checked by clicking the label */
+.switch input[type=checkbox]:checked + label::after {
+    position: absolute;
+    left: 50%;
+}
+
+.switch input[type=checkbox]:disabled + label {
+    background: #ccc;
+}
+
+.switch input[type=checkbox]:disabled + label::after {
+    background: fade(white, 60%);
+}
