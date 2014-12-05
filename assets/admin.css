@@ -437,10 +437,12 @@ a.delete {
 #main-nav li {
   text-align: center;
 }
-#main-nav li.current a {
+#main-nav li.current a,
+#main-nav li.current_ancestor a {
   color: #25c421;
 }
-#main-nav li.current a:hover {
+#main-nav li.current a:hover,
+#main-nav li.current_ancestor a:hover {
   color: #29da25;
 }
 #main-nav li a {
@@ -651,6 +653,12 @@ form textarea:focus {
   outline: none;
   border: 2px solid #25c421;
 }
+form input[type=text]:disabled,
+form input[type=password]:disabled,
+form input[type=email]:disabled,
+form textarea:disabled {
+  background: rgba(0, 0, 0, 0.1);
+}
 form input[type=radio] + label {
   display: inline;
   margin: 0 1em 0 0.5em;
@@ -792,13 +800,13 @@ table th {
   width: 80%;
   display: inline-block;
   display: table-cell;
-  padding: 0.5em 0 0;
+  padding: 0.5em 0;
 }
 .switch-row-switch {
   display: table-cell;
   text-align: right;
   vertical-align: middle;
-  padding: 0.5em 0 0;
+  padding: 0.5em 0;
 }
 .switch {
   position: relative;
@@ -1193,7 +1201,7 @@ table th {
   opacity: 1;
 }
 .post-editor .editor-sidebar-section {
-  padding: 0 2em;
+  padding: 0.5em 2em;
 }
 .post-editor .editor-sidebar-heading {
   padding: 0 2em;

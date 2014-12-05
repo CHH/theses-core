@@ -31,6 +31,8 @@ class Theses extends \Pimple
             $admin = $this['admin.engine'];
             $admin->boot();
 
+            $this['dispatcher']->dispatch(Events::ADMIN_BOOT, new event\ApplicationBootEvent($admin));
+
             return $admin;
         });
 
@@ -40,22 +42,25 @@ class Theses extends \Pimple
             $frontend = $this['frontend.engine'];
             $frontend->boot();
 
+            $this['dispatcher']->dispatch(Events::FRONTEND_BOOT, new event\ApplicationBootEvent($frontend));
+
             return $frontend;
         });
 
         // Load config in its own scope
         call_user_func(function($app) {
-            require($this['config_file']);
+            require($this['init_file']);
         }, $this);
-
-        $this->bootPlugins();
 
         return $stack->resolve($frontend);
     }
 
     function run()
     {
-        \Stack\run($this->bootstrap());
+        $kernel = $this->bootstrap();
+        \Stack\run($kernel);
+
+        $this['settings_store']->save();
     }
 
     function on($event, $listener)
@@ -90,7 +95,7 @@ class Theses extends \Pimple
     function addSettingsMenuEntry($name, array $options = [])
     {
         $this->extendShared('admin.engine', function($admin) use ($name, $options) {
-            $admin->extendShared('menu.settings', function($menu) use ($name, $options) {
+            $admin->extendShared('menu.main', function($menu) use ($name, $options) {
                 $menu['Settings']->addChild($name, $options);
                 return $menu;
             });
@@ -103,14 +108,19 @@ class Theses extends \Pimple
     function addPluginSettingsMenuEntry($name, array $options = [])
     {
         $this->extendShared('admin.engine', function($admin) use ($name, $options) {
-            $admin->extendShared('menu.settings', function($menu) use ($name, $options) {
-                $menu['Plugins']->addChild($name, $options);
+            $admin->extendShared('menu.main', function($menu) use ($name, $options) {
+                $menu['Settings']['Plugins']->addChild($name, $options);
                 return $menu;
             });
             return $admin;
         });
 
         return $this;
+    }
+
+    function getPlugins()
+    {
+        return $this->plugins;
     }
 
     function usePlugin(plugin\Plugin $plugin, array $parameters = [])
@@ -146,12 +156,6 @@ class Theses extends \Pimple
         return $this;
     }
 
-    function bootPlugins()
-    {
-        foreach ($this->plugins as $plugin) {
-        }
-    }
-
     private function initSharedServices()
     {
         $app = $this;
@@ -170,12 +174,10 @@ class Theses extends \Pimple
                 return $this;
             });
 
-            $plugins = array_filter($this->plugins, function ($plugin) {
-                return $plugin instanceof plugin\SettingsEnabled;
-            });
-
-            foreach ($plugins as $plugin) {
-                $this->initPluginSettings($admin, $plugin);
+            foreach ($this->plugins as $plugin) {
+                if ($plugin instanceof plugin\SettingsEnabled) {
+                    $this->initPluginSettings($admin, $plugin);
+                }
             }
 
             return $admin;
@@ -198,12 +200,16 @@ class Theses extends \Pimple
             ];
         };
 
+        $app['settings_store'] = $app->share(function () {
+            return new FileSettingsManager($this['config_file']);
+        });
+
         $app['system_settings'] = $app->share(function () {
             return $this['settings_factory']('system', $this['system_settings.defaults']);
         });
 
         $app['settings_factory'] = $app->protect(function ($namespace, array $defaults = []) {
-            return new SettingsManager($this['phpcr.session'], $namespace, $defaults);
+            return new SettingsNamespace($this['settings_store'], $namespace, $defaults);
         });
 
         $app['posts'] = $app->share(function () use ($app) {
@@ -215,36 +221,55 @@ class Theses extends \Pimple
         });
 
         $this['site'] = $this->share(function () {
-            return new Site($this, $this['posts']);
+            return new Site($this);
         });
 
         $app['db'] = $app->share(function () {
-            $options = parse_url($_SERVER['DATABASE_URL']);
+            $options = [];
 
-            // Compatibility with Heroku Postgres which uses postgres:// schemes
-            // in database URLs
-            if ($options['scheme'] === 'postgres') {
-                $driver = 'pdo_pgsql';
+            if (isset($_SERVER['DATABASE_URL'])) {
+                $options = parse_url($_SERVER['DATABASE_URL']);
+                // Compatibility with Heroku Postgres which uses postgres:// schemes
+                // in database URLs
+                if (@$options['scheme'] === 'postgres') {
+                    $driver = 'pdo_pgsql';
+                } else {
+                    $driver = 'pdo_' . @$options['scheme'];
+                }
+
+                $connectionOptions = [
+                    'driver' => $driver,
+                    'host' => $options['host'],
+                    'user' => @$options['user'],
+                    'password' => @$options['pass'],
+                    'dbname' => trim(@$options['path'], '/'),
+                ];
             } else {
-                $driver = 'pdo_' . $options['scheme'];
+                $systemSettings = $this['system_settings'];
+
+                $connectionOptions = [
+                    'driver' => $systemSettings->get('databaseDriver'),
+                    'host' => $systemSettings->get('databaseHost'),
+                    'user' => $systemSettings->get('databaseUser'),
+                    'password' => $systemSettings->get('databasePassword'),
+                    'dbname' => $systemSettings->get('databaseName'),
+                ];
             }
 
-            return \Doctrine\DBAL\DriverManager::getConnection(array(
-                'driver'    => $driver,
-                'host'      => $options['host'],
-                'user'      => @$options['user'],
-                'password'  => @$options['pass'],
-                'dbname'    => trim($options['path'], '/'),
-            ));
+            return \Doctrine\DBAL\DriverManager::getConnection($connectionOptions);
         });
 
         $app['converter.markdown'] = $app->share(function () {
             return new MarkdownConverter(new \cebe\markdown\GithubMarkdown);
         });
 
+        $app['slugify'] = $app->share(function () {
+            return new \Cocur\Slugify\Slugify();
+        });
+
         $app['dispatcher'] = $app->share(function () {
             $dispatcher = new EventDispatcher;
-            $dispatcher->addSubscriber($this['converter.markdown']);
+            $this->initCoreEventHandlers($dispatcher);
 
             return $dispatcher;
         });
@@ -253,7 +278,7 @@ class Theses extends \Pimple
 
         $app['phpcr.repository'] = $app->share(function () use ($app) {
             $factory = new \Jackalope\RepositoryFactoryDoctrineDBAL();
-            $repository = $factory->getRepository(array('jackalope.doctrine_dbal_connection' => $app['db']));
+            $repository = $factory->getRepository(['jackalope.doctrine_dbal_connection' => $app['db']]);
 
             return $repository;
         });
@@ -263,14 +288,34 @@ class Theses extends \Pimple
         };
     }
 
+    private function initCoreEventHandlers($dispatcher)
+    {
+        $dispatcher->addListener(Events::ADMIN_BOOT, function (event\ApplicationBootEvent $event) {
+            $app = $event->getApplication();
+            foreach ($this->plugins as $plugin) {
+                if ($plugin instanceof plugin\MenuEnabled) {
+                    $app->extendShared('menu.main', function ($menu) use ($plugin) {
+                        foreach ((array) $plugin->getMainMenuEntries() as $name => $menuEntry) {
+                            $menu->addChild($name, $menuEntry);
+                        }
+
+                        return $menu;
+                    });
+                }
+            }
+        });
+
+        $dispatcher->addSubscriber($this['converter.markdown']);
+    }
+
     private function initPluginSettings(AdminApplication $admin, plugin\Plugin $plugin)
     {
         $info = $plugin::getPluginInfo();
-        $pluginSlug = (new \Cocur\Slugify\Slugify)->slugify($info['name']);
+        $pluginSlug = $this['slugify']->slugify($info['name']);
         $pluginRoute = 'plugin_' . $pluginSlug;
 
-        $admin->extendShared('menu.settings', function ($menu) use ($info, $pluginRoute) {
-            $menu['Plugins']->addChild($info['name'], [
+        $admin->extendShared('menu.main', function ($menu) use ($info, $pluginRoute) {
+            $menu['Settings']['Plugins']->addChild($info['name'], [
                 'label' => $info['name'],
                 'route' => $pluginRoute,
             ]);
@@ -282,7 +327,7 @@ class Theses extends \Pimple
             "/settings/$pluginSlug",
             function (Request $request) use ($admin, $plugin, $pluginSlug, $pluginRoute) {
                 $info = $plugin::getPluginInfo();
-                $settings = $this['settings_factory']($info['name'], $plugin::getSettingsDefaults() ?: []);
+                $settings = $this['settings_factory']($pluginSlug, $plugin::getSettingsDefaults() ?: []);
 
                 $settingsForm = $plugin::getSettings($admin->form($settings->all()))->getForm();
                 $settingsForm->handleRequest($request);

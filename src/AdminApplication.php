@@ -57,19 +57,7 @@ class AdminApplication extends \Silex\Application
                 'extras' => ['icon' => 'cog'],
             ]);
 
-            $menu->addChild('Logout', [
-                'label' => "Logout",
-                'uri' => $request->getBaseUrl().'/logout',
-                'extras' => ['icon' => 'power-off'],
-            ]);
-
-            return $menu;
-        });
-
-        $app['menu.settings'] = $app->share(function () use ($app) {
-            $menu = $app['knp_menu.factory']->createItem('Settings');
-
-            $core = $menu->addChild('Core', [
+            $core = $menu['Settings']->addChild('Core', [
                 'label' => 'Core',
             ]);
 
@@ -77,6 +65,7 @@ class AdminApplication extends \Silex\Application
                 'label' => 'General',
                 'route' => 'settings',
             ]);
+
             $core->addChild('Media', [
                 'label' => 'Media',
                 'uri' => '',
@@ -87,10 +76,21 @@ class AdminApplication extends \Silex\Application
                 'route' => 'users',
             ]);
 
-            $menu->addChild('Plugins', [
+            $menu['Settings']->addChild('Plugins', [
                 'label' => 'Plugins',
             ]);
 
+            $menu->addChild('Logout', [
+                'label' => "Logout",
+                'uri' => $request->getBaseUrl().'/logout',
+                'extras' => ['icon' => 'power-off'],
+            ]);
+
+            return $menu;
+        });
+
+        $app['menu.settings'] = $app->share(function () use ($app) {
+            $menu = $app['menu.main']['Settings'];
             return $menu;
         });
 

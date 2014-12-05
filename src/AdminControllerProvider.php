@@ -23,29 +23,7 @@ class AdminControllerProvider implements \Silex\ControllerProviderInterface
         })->bind('admin_login');
 
         $routes->get('/', function() use ($app) {
-            $stream = [
-                [
-                    'type' => 'note',
-                    'title' => 'Lean PHP',
-                    'excerpt' => "Lorem ipsum",
-                    'icon' => 'comment-o'
-                ],
-                [
-                    'type' => 'link',
-                    'href' => 'http://xkcd.com',
-                    'title' => 'Most awesome comic site EVER',
-                    'description' => '',
-                    'icon' => 'share-square-o'
-                ],
-                [
-                    'type' => 'image',
-                    'image' => 'http://lorempixel.com/1920/1080/cats',
-                    'description' => 'So cute ;)',
-                    'icon' => 'picture-o'
-                ]
-            ];
-
-            return $app['twig']->render("index.html", compact('stream'));
+            return $app['twig']->render("dashboard.html");
         })->bind('dashboard');
 
         $routes->get('/settings', function() use ($app) {

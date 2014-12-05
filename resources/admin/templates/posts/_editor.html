@@ -46,15 +46,15 @@
     <div class="editor-sidebar-section">
         <a href="{{ path('posts') }}">&larr; Back to posts</a>
     </div>
-    {% if post.lastModified is defined %}
-    <div class="editor-sidebar-section">
-        <span class="meta">Last updated {{ post.lastModified | date('M d Y \\a\\t H:i') }}</span>
-    </div>
-    {% endif %}
     <div class="editor-sidebar-section">
         <div class="toolbar stretch-childs">
             <button name="save" type="submit" class="btn btn-primary">Save Post</button>
         </div>
+        {% if post.lastModified is defined %}
+        <div>
+            <span class="meta"><small>Your post was saved on {{ post.lastModified | date('M d Y \\a\\t H:i') }}</small></span>
+        </div>
+        {% endif %}
     </div>
     <div class="editor-sidebar-section">
         <div class="switch-row">
@@ -62,11 +62,6 @@
                 <label for="published">
                     Published
                 </label>
-                <small>
-                    {% if post.publishedAt %}
-                    (since {{ post.publishedAt|date('M d Y') }})
-                    {% endif %}
-                </small>
             </div>
             <div class="switch-row-switch">
                 <input type="hidden" name="post[published]" value="0">
